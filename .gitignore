@@ -1,0 +1,28 @@
+# Python compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django migrations (ignore all but keep __init__.py)
+*/migrations/*
+!*/migrations/__init__.py
+
+# Media files (user uploads)
+media/
+
+# SQLite database (if using, you might want to keep it in dev)
+db.sqlite3
+
+# Virtual environment
+venv/
+.env/
+
+# VSCode / IDE settings
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Static files (collected with collectstatic)
+staticfiles/
