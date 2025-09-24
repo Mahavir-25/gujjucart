@@ -9,7 +9,7 @@ class IndexView(TemplateView):
     template_name = "dashboard/index.html"
 
 class signup_view(TemplateView):
-    template_name='signup.html'
+    template_name='dashboard/signup.html'
     form_class=SignUpForm
     success_url= reverse_lazy('index')
 
