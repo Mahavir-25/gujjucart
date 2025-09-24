@@ -1,32 +1,23 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Signup</title>
-</head>
-<body>
-    <h2>Create Account</h2>
-    <form method="POST">
-        {% csrf_token %}
+<form method="POST">
+    {% csrf_token %}
 
-        <label for="id_username">Username:</label>
-        {{ form.username }} <br><br>
+    <label for="id_username">Username:</label>
+    <input type="text" name="username" id="id_username" value="{{ form.username.value|default:'' }}" required><br><br>
 
-        <label for="id_first_name">First Name:</label>
-        {{ form.first_name }} <br><br>
+    <label for="id_first_name">First Name:</label>
+    <input type="text" name="first_name" id="id_first_name" value="{{ form.first_name.value|default:'' }}"><br><br>
 
-        <label for="id_last_name">Last Name:</label>
-        {{ form.last_name }} <br><br>
+    <label for="id_last_name">Last Name:</label>
+    <input type="text" name="last_name" id="id_last_name" value="{{ form.last_name.value|default:'' }}"><br><br>
 
-        <label for="id_email">Email:</label>
-        {{ form.email }} <br><br>
+    <label for="id_email">Email:</label>
+    <input type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}" required><br><br>
 
-        <label for="id_password1">Password:</label>
-        {{ form.password1 }} <br><br>
+    <label for="id_password1">Password:</label>
+    <input type="password" name="password1" id="id_password1" required><br><br>
 
-        <label for="id_password2">Confirm Password:</label>
-        {{ form.password2 }} <br><br>
+    <label for="id_password2">Confirm Password:</label>
+    <input type="password" name="password2" id="id_password2" required><br><br>
 
-        <button type="submit">Sign Up</button>
-    </form>
-</body>
-</html>
+    <button type="submit">Sign Up</button>
+</form>
