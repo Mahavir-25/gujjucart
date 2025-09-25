@@ -8,6 +8,9 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p0vJ6pr0M8rP/6F2kaNPhqjwZhPa3Bq49uPHu2L3wcu6Jqk3Z+6Y+f6m2zZh4zIv+X+6R7fPz1Y2bJ2/6W6U4g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  
   <style>
    body, html {
     height: 100%;
@@ -27,7 +30,7 @@
     max-width: 700px;      /* smaller width */
     padding: 20px;         /* less padding */
     border-radius: 10px;
-    margin-top: 20px; 
+    margin: 40px auto; 
     background-color:white;
 }
 
@@ -111,10 +114,11 @@
       <!-- Left section with logo and contact -->
       <div class="col-md-5 left-section text-center text-md-start">
         <div class="contact-info">
-          <p><i class="fas fa-phone"></i> Phone: +123-456-7890</p>
-          <p><i class="fas fa-envelope"></i> E-Mail: hello@reallygreatsite.com</p>
-          <p><i class="fas fa-globe"></i> Website: www.reallygreatsite.com</p>
-          <p><i class="fas fa-map-marker-alt"></i> Address: 123 Anywhere St., Any City</p>
+         <p><i class="fas fa-phone"></i> Phone: +123-456-7890</p>
+        <p><i class="fas fa-envelope"></i> E-Mail: hello@reallygreatsite.com</p>
+        <p><i class="fas fa-globe"></i> Website: www.reallygreatsite.com</p>
+        <p><i class="fas fa-map-marker-alt"></i> Address: 123 Anywhere St., Any City</p>
+
         </div>
       </div>
 
@@ -179,10 +183,23 @@
               <button type="button" class="upload-btn" onclick="document.getElementById('profileImage').click()">
                 <i class="fas fa-upload"></i> Upload
               </button>
-              {% for error in form.profile_image.errors %}
-                <div class="text-danger small">{{ error }}</div>
-              {% endfor %}
-            </div>
+              {% if form.errors %}
+    <div class="mt-3">
+        {% if form.non_field_errors %}
+            <div class="text-danger small">{{ form.non_field_errors.0 }}</div>
+        {% else %}
+            {% for field, errors in form.errors.items %}
+                {% if forloop.first %}
+                    <div class="text-danger small">{{ errors.0 }}</div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endif %}
+
+
+        </div>
+
 
             <button type="submit" class="register-btn">Register</button>
             <div class="text-center mt-3">
