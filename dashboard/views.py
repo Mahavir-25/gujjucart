@@ -9,7 +9,8 @@ from django.shortcuts import redirect
 
 class IndexView(TemplateView):
     template_name = "dashboard/index.html"
-
+class LoginView(TemplateView):
+    template_name="dashboard/login.html"
 class SignupView(FormView):
     template_name = 'dashboard/signup.html'
     form_class = SignUpForm
