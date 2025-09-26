@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from .models import UserProfile
 from django.core.exceptions import ValidationError
@@ -56,4 +57,27 @@ class SignUpForm(UserCreationForm):
             UserProfile.objects.create(user=user, profile_image=profile_image)
 
         return user
+
+class LoginForm(AuthenticationForm):
+     username=forms.CharField(
+          required=True,max_length=30,
+          widget=forms.TextInput(attrs={'class': 'form-control'}))
+     
+     password=forms.CharField(
+          required=True,
+          label="password",
+          widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+     
+     error_messages = {
+        'invalid_login': (
+            "Enter a correct username and password."
+        ),
+        'inactive': ("This account is inactive."),
+        }
+     def confirm_login_allowed(self, user):
+        if not user.is_active:
+            raise forms.ValidationError(
+                self.error_messages['inactive'],
+                code='inactive',
+            )
 
