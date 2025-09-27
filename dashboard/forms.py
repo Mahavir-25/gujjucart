@@ -4,6 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from .models import UserProfile
 from django.core.exceptions import ValidationError
+from django.contrib.auth import authenticate
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(
@@ -54,30 +55,39 @@ class SignUpForm(UserCreationForm):
         if commit:
             user.save()
             profile_image = self.cleaned_data.get('profile_image')
-            UserProfile.objects.create(user=user, profile_image=profile_image)
+            # role will be 'u' by default, but you can also set explicitly
+            UserProfile.objects.create(
+                user=user,
+                profile_image=profile_image,
+                role='u'   # Default role is User
+            )
 
         return user
 
-class LoginForm(AuthenticationForm):
-     username=forms.CharField(
-          required=True,max_length=30,
-          widget=forms.TextInput(attrs={'class': 'form-control'}))
-     
-     password=forms.CharField(
-          required=True,
-          label="password",
-          widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-     
-     error_messages = {
-        'invalid_login': (
-            "Enter a correct username and password."
-        ),
-        'inactive': ("This account is inactive."),
-        }
-     def confirm_login_allowed(self, user):
-        if not user.is_active:
-            raise forms.ValidationError(
-                self.error_messages['inactive'],
-                code='inactive',
-            )
+class LoginForm(forms.Form):
+    username = forms.CharField(
+        label="Username or Email",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.user_cache = None
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        username = cleaned_data.get("username")
+        password = cleaned_data.get("password")
+
+        if username and password:
+            self.user_cache = authenticate(username=username, password=password)
+            if self.user_cache is None:
+                raise forms.ValidationError("Invalid username/email or password")
+        return cleaned_data
+
+    def get_user(self):
+        return self.user_cache
 

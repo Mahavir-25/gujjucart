@@ -28,6 +28,11 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+AUTHENTICATION_BACKENDS = [
+    'dashboard.backends.UsernameOrEmailBackend',   # our custom backend
+    'django.contrib.auth.backends.ModelBackend',   # keep default
+]
+
 # Application definition
 
 INSTALLED_APPS = [

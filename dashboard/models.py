@@ -7,9 +7,11 @@ class UserProfile(models.Model):
         ('a', 'Admin'),
         ('s', 'Staff'),
     )
-    user = models.OneToOneField(User, on_delete=models.CASCADE)  # lowercase 'user' is important
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=15, blank=True, null=True)
     profile_image = models.ImageField(upload_to="profiles/", blank=True, null=True)
+    role = models.CharField(max_length=1, choices=ROLE_CHOICES, default='u')
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user.username} ({self.get_role_display()})"

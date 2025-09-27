@@ -13,17 +13,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 class LoginView(FormView):
     template_name = 'dashboard/login.html'
     form_class = LoginForm
-    success_url = reverse_lazy('index')  # redirect after successful login
+    success_url = reverse_lazy('index') 
 
     def form_valid(self, form):
-        # Called if form is valid
-        user = form.get_user()  # get authenticated user from the form
-        login(self.request, user)  # log the user in (session)
+        user = form.get_user()  
+        login(self.request, user) 
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        # Called if form is invalid
-        return super().form_invalid(form)
+       return super().form_invalid(form)
+    
+    
 class LogoutView(TemplateView):
     def get(self, request, *args, **kwargs):
         logout(request)
@@ -42,9 +42,9 @@ class SignupView(FormView):
         login(self.request, user)
         return redirect('login')
     def get_form_kwargs(self):
-        """Pass request.FILES to the form so profile_image saves"""
         kwargs = super().get_form_kwargs()
-        kwargs.update({'files': self.request.FILES})
+        if self.request.method == 'POST':   # ✅ only bind on POST
+            kwargs.update({'files': self.request.FILES})
         return kwargs
     def  form_invalid(self, form):
         response = super().form_invalid(form)
