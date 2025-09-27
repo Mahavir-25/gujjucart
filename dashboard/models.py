@@ -2,6 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class UserProfile(models.Model):
+    ROLE_CHOICES = (
+        ('u', 'User'),
+        ('a', 'Admin'),
+        ('s', 'Staff'),
+    )
     user = models.OneToOneField(User, on_delete=models.CASCADE)  # lowercase 'user' is important
     phone = models.CharField(max_length=15, blank=True, null=True)
     profile_image = models.ImageField(upload_to="profiles/", blank=True, null=True)
