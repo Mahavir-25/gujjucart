@@ -91,3 +91,33 @@ class LoginForm(forms.Form):
     def get_user(self):
         return self.user_cache
 
+class ForgotPasswordForm(forms.Form):
+    email = forms.EmailField(
+        label="Enter your email",
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Your email'})
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if not User.objects.filter(email=email, userprofile__role='u').exists():
+            raise forms.ValidationError("No user found with this email.")
+        return email
+    
+# Step 1b: Reset Password Form
+class ResetPasswordForm(forms.Form):
+    password1 = forms.CharField(
+        label="New Password",
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )
+    password2 = forms.CharField(
+        label="Confirm Password",
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        p1 = cleaned_data.get("password1")
+        p2 = cleaned_data.get("password2")
+        if p1 != p2:
+            raise forms.ValidationError("Passwords do not match.")
+        return cleaned_data
