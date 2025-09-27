@@ -37,13 +37,18 @@ class SignupView(FormView):
     template_name = 'dashboard/signup.html'
     form_class = SignUpForm
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.update({'files': self.request.FILES})  # Pass uploaded files
+        return kwargs
+
     def form_valid(self, form):
-        user = form.save()
-        login(self.request, user)
-        return redirect('login')
-    def  form_invalid(self, form):
-        response = super().form_invalid(form)
-        print(form.errors)
-        return response
+        user = form.save()  # saves User and profile image
+        login(self.request, user)  # log in user after signup
+        return redirect('index')  # redirect to dashboard
+
+    def form_invalid(self, form):
+        print(form.errors)  # debug errors
+        return super().form_invalid(form)
         
     
