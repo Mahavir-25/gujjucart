@@ -11,7 +11,9 @@
 </head>
 
 <body>
-
+  {% include "dashboard/sidebar.html" %}
+<div class="body-wrapper">
+  {% include "dashboard/header.html" %}
   {% block content %}
 
   {% endblock %}
