@@ -1,14 +1,12 @@
 from django.views.generic import TemplateView
 from django.urls import reverse_lazy
-from django.views.generic.edit import FormView
-from django.contrib.auth import login
+from django.views.generic.edit import FormView,UpdateView,FormView
 from .forms import SignUpForm,LoginForm
-from django.views.generic.edit import FormView
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import make_password
-from .forms import ForgotPasswordForm, ResetPasswordForm
+from .forms import ForgotPasswordForm, ResetPasswordForm,ProfileUpdateForm
 from django.contrib.auth.models import User
 
 
@@ -35,14 +33,27 @@ class IndexView(LoginRequiredMixin,TemplateView):
     template_name = "dashboard/index.html"
     login_url = reverse_lazy('login')
 
+
+
+class ProfileView(LoginRequiredMixin,TemplateView):
+    template_name = "dashboard/profile.html"
+    login_url = reverse_lazy('login')
+
 class SignupView(FormView):
     template_name = 'dashboard/signup.html'
     form_class = SignUpForm
 
     def form_valid(self, form):
         user = form.save()
-        login(self.request, user)
-        return redirect('login')
+        raw_password = form.cleaned_data['password1']
+        user = authenticate(self.request, username=user.username, password=raw_password)
+        if user is not None:
+            login(self.request, user)  # ✅ Safe to call now
+            return redirect('index')  # or your dashboard/homepage
+        else:
+            form.add_error(None, "Authentication failed. Please try logging in manually.")
+            return self.form_invalid(form)
+        
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         if self.request.method == 'POST':   # ✅ only bind on POST
@@ -89,3 +100,14 @@ class ResetPasswordView(FormView):
     def form_invalid(self, form):
         # Called if form has errors
         return render(self.request, self.template_name, {'form': form})
+# profile update view
+
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+    model = User
+    form_class = ProfileUpdateForm
+    template_name = 'dashboard/update_profile.html'
+    success_url = reverse_lazy('profile')  # redirect after successful update
+
+    def get_object(self, queryset=None):
+        # Return the currently logged-in user
+        return self.request.user

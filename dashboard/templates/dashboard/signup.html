@@ -181,6 +181,13 @@
                 <div class="text-danger small">{{ error }}</div>
               {% endfor %}
             </div>
+            <div class="mb-3">
+              {{ form.phone.label_tag }}
+              {{ form.phone }}
+              {% for error in form.phone.errors %}
+                <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
 
             <div class="mb-3">
             <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>

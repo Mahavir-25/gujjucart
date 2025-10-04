@@ -5,62 +5,47 @@ from django.contrib.auth.models import User
 from .models import UserProfile
 from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class SignUpForm(UserCreationForm):
-    first_name = forms.CharField(
-        max_length=30, required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-    last_name = forms.CharField(
-        max_length=30, required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-    email = forms.EmailField(
-        required=True,
-        widget=forms.EmailInput(attrs={'class': 'form-control'})
-    )
-    password1 = forms.CharField(
-        label="Password",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'})
-    )
-    password2 = forms.CharField(
-        label="Confirm Password",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'})
-    )
-    profile_image = forms.ImageField(
-        required=False,
-        widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
-    )
+    first_name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    last_name = forms.CharField(max_length=30, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    phone = forms.CharField(max_length=15, required=True, widget=forms.TextInput(attrs={'class':'form-control'}))
+    password1 = forms.CharField(label="Password", widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    password2 = forms.CharField(label="Confirm Password", widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    profile_image = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'password1', 'password2', 'profile_image']
+        fields = ['first_name', 'last_name', 'email', 'phone', 'password1', 'password2', 'profile_image']
+
     def clean(self):
-            cleaned_data = super().clean()
-            first_name = cleaned_data.get('first_name')
-            
-            # Check if username already exists
-            if User.objects.filter(username=first_name).exists():
-                raise ValidationError("User with this username already exists. Please choose a different first name.")
-            
-            return cleaned_data
+        cleaned_data = super().clean()
+        first_name = cleaned_data.get('first_name')
+
+        if User.objects.filter(username=first_name).exists():
+            raise ValidationError("User with this username already exists. Please choose a different first name.")
+        return cleaned_data
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.username = self.cleaned_data['first_name']  # safe now, no duplicates
+        user.username = self.cleaned_data['first_name']
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         user.email = self.cleaned_data['email']
+        user.phone = self.cleaned_data['phone']  # ✅ assign to instance
+
+        profile_image = self.cleaned_data.get('profile_image')
+        if profile_image:
+            user.profile_image = profile_image
+
+        user.role = 'u'  # default role
 
         if commit:
             user.save()
-            profile_image = self.cleaned_data.get('profile_image')
-            # role will be 'u' by default, but you can also set explicitly
-            UserProfile.objects.create(
-                user=user,
-                profile_image=profile_image,
-                role='u'   # Default role is User
-            )
 
         return user
 
@@ -86,6 +71,8 @@ class LoginForm(forms.Form):
             self.user_cache = authenticate(username=username, password=password)
             if self.user_cache is None:
                 raise forms.ValidationError("Invalid username/email or password")
+            elif not self.user_cache.is_active:
+                raise forms.ValidationError("This account is inactive.")
         return cleaned_data
 
     def get_user(self):
@@ -121,3 +108,15 @@ class ResetPasswordForm(forms.Form):
         if p1 != p2:
             raise forms.ValidationError("Passwords do not match.")
         return cleaned_data
+# profile update form
+
+class ProfileUpdateForm(forms.ModelForm):
+    first_name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs={'class':'form-control'}))
+    last_name = forms.CharField(max_length=30, required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class':'form-control'}))
+    phone = forms.CharField(max_length=15, required=False, widget=forms.TextInput(attrs={'class':'form-control'}))
+    profile_image = forms.ImageField(required=False, widget=forms.ClearableFileInput(attrs={'class':'form-control'}))
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'phone', 'profile_image']

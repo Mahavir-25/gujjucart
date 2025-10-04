@@ -15,7 +15,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+AUTH_USER_MODEL = 'dashboard.UserProfile'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -26,7 +26,6 @@ SECRET_KEY = 'django-insecure-5vqv6@tdudj5&y8wa!44#!7frk_akud6n1xv)tai$-1o011yua
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 AUTHENTICATION_BACKENDS = [
     'dashboard.backends.UsernameOrEmailBackend',   # our custom backend

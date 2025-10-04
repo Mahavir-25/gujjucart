@@ -1,0 +1,68 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="body-wrapper-inner">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card w-100">
+                    <div class="card-body">
+                        <h2 class="mb-4">Update Profile</h2>
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row">
+                                <!-- Left Column -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.first_name.label_tag }} 
+                                        {{ form.first_name }}
+                                        {% if form.first_name.errors %}
+                                            <div class="text-danger">{{ form.first_name.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mb-3">
+                                        {{ form.last_name.label_tag }} 
+                                        {{ form.last_name }}
+                                        {% if form.last_name.errors %}
+                                            <div class="text-danger">{{ form.last_name.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mb-3">
+                                        {{ form.email.label_tag }} 
+                                        {{ form.email }}
+                                        {% if form.email.errors %}
+                                            <div class="text-danger">{{ form.email.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Right Column -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        {{ form.phone.label_tag }} 
+                                        {{ form.phone }}
+                                        {% if form.phone.errors %}
+                                            <div class="text-danger">{{ form.phone.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mb-3">
+                                        {{ form.profile_image.label_tag }} 
+                                        {{ form.profile_image }}
+                                        {% if form.profile_image.errors %}
+                                            <div class="text-danger">{{ form.profile_image.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
