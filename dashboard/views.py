@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView,CreateView,ListView
+from django.views.generic import TemplateView,CreateView,ListView,DetailView,DeleteView
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView,UpdateView,FormView
 from .forms import SignUpForm,LoginForm,ProductForm
@@ -133,3 +133,20 @@ class ProductListView(ListView):
     # Optional: show only active products
     def get_queryset(self):
         return Product.objects.filter(is_active=True).order_by('-created_at')
+    
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = 'dashboard/product_view.html'  # your template path
+    context_object_name = 'product'
+
+class ProductUpdateView(UpdateView):
+    model = Product
+    fields = ['name', 'description', 'price', 'stock', 'product_image', 'is_active']
+    template_name = 'dashboard/product_update.html'
+    success_url = reverse_lazy('product_list')
+    
+# ✅ Delete product
+class ProductDeleteView(DeleteView):
+    model = Product
+    template_name = 'dashboard/product_delete.html'
+    success_url = reverse_lazy('product_list')

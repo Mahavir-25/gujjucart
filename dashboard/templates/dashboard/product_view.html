@@ -1,0 +1,48 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="body-wrapper-inner">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            
+                
+                    <div class="container mt-2">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">{{ product.name }}</h3>
+                        </div>
+                        <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                            {% if product.product_image %}
+                                <img src="{{ product.product_image.url }}" alt="{{ product.name }}" class="img-fluid rounded">
+                            {% else %}
+                                <img src="{% static 'images/no-image.png' %}" alt="No Image" class="img-fluid rounded">
+                            {% endif %}
+                            </div>
+                            <div class="col-md-8">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><strong>Category:</strong> {{ product.category }}</li>
+                                <li class="list-group-item"><strong>Price:</strong> ₹{{ product.price }}</li>
+                                <li class="list-group-item"><strong>Stock:</strong> {{ product.stock }}</li>
+                                <li class="list-group-item"><strong>Description:</strong> {{ product.description|safe }}</li>
+                                <li class="list-group-item"><strong>Added On:</strong> {{ product.created_at|date:"d M, Y" }}</li>
+                            </ul>
+
+                            <div class="mt-4">
+                                <a href="{% url 'product_update' product.id %}" class="btn btn-warning me-2">Update</a>
+                                <a href="{% url 'product_delete' product.id %}" class="btn btn-danger me-2">Delete</a>
+                                <a href="{% url 'product_list' %}" class="btn btn-secondary">Back</a>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                 
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -31,7 +31,8 @@
                                         {% if form.description.errors %}
                                             <div class="text-danger">{{ form.description.errors }}</div>
                                         {% endif %}
-                                    </div>
+                                        </div>
+
                                     <div class="mb-3">
                                         {{ form.price.label_tag }}
                                         {{ form.price }}
@@ -80,3 +81,29 @@
     </div>
 </div>
 {% endblock %}
+{% block script %} 
+<!-- ✅ CKEditor 5 Classic Build (CDN) -->
+<script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
+
+<script>
+  // Initialize CKEditor on the description field
+  document.addEventListener("DOMContentLoaded", function() {
+      const textarea = document.querySelector('#id_description');
+      if (textarea) {
+          ClassicEditor.create(textarea, {
+              toolbar: [
+                  'heading', '|',
+                  'bold', 'italic', 'underline', 'strikethrough', '|',
+                  'bulletedList', 'numberedList', '|',
+                  'link', 'blockQuote', '|',
+                  'undo', 'redo'
+              ]
+          })
+          .catch(error => {
+              console.error('Error initializing CKEditor:', error);
+          });
+      }
+  });
+</script>
+
+{% endblock script %}
