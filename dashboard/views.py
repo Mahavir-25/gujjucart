@@ -1,13 +1,14 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView,CreateView,ListView
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView,UpdateView,FormView
-from .forms import SignUpForm,LoginForm
+from .forms import SignUpForm,LoginForm,ProductForm
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import make_password
 from .forms import ForgotPasswordForm, ResetPasswordForm,ProfileUpdateForm
 from django.contrib.auth.models import User
+from dashboard.models import Product
 
 
 class LoginView(FormView):
@@ -111,3 +112,24 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     def get_object(self, queryset=None):
         # Return the currently logged-in user
         return self.request.user
+
+class AddProductView(LoginRequiredMixin, CreateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'dashboard/add_product.html'
+    success_url = reverse_lazy('product_list')  # redirect to product list after adding
+
+    # Optional: only allow admin or staff to add products
+    def dispatch(self, request, *args, **kwargs):
+        
+        return super().dispatch(request, *args, **kwargs)
+    
+class ProductListView(ListView):
+    model = Product
+    template_name = 'dashboard/product_list.html'  # Your template
+    context_object_name = 'products'
+    paginate_by = 10 
+
+    # Optional: show only active products
+    def get_queryset(self):
+        return Product.objects.filter(is_active=True).order_by('-created_at')
