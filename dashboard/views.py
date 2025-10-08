@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import make_password
+from django.contrib import messages
 from .forms import ForgotPasswordForm, ResetPasswordForm,ProfileUpdateForm
 from django.contrib.auth.models import User
 from dashboard.models import Product
@@ -113,16 +114,21 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
         # Return the currently logged-in user
         return self.request.user
 
-class AddProductView(LoginRequiredMixin, CreateView):
+class AddProductView(CreateView):
     model = Product
     form_class = ProductForm
-    template_name = 'dashboard/add_product.html'
-    success_url = reverse_lazy('product_list')  # redirect to product list after adding
+    template_name = 'dashboard/product_form.html'
+    success_url = reverse_lazy('product_list')  # redirect after successful add
 
-    # Optional: only allow admin or staff to add products
-    def dispatch(self, request, *args, **kwargs):
-        
-        return super().dispatch(request, *args, **kwargs)
+    # Handle valid form
+    def form_valid(self, form):
+        messages.success(self.request, "✅ Product added successfully!")
+        return super().form_valid(form)
+
+    # Handle invalid form
+    def form_invalid(self, form):
+        messages.error(self.request, "⚠️ Please correct the errors below.")
+        return super().form_invalid(form)
     
 class ProductListView(ListView):
     model = Product
@@ -132,7 +138,7 @@ class ProductListView(ListView):
 
     # Optional: show only active products
     def get_queryset(self):
-        return Product.objects.filter(is_active=True).order_by('-created_at')
+        return Product.objects.filter().order_by('-created_at')
     
 class ProductDetailView(DetailView):
     model = Product
@@ -141,9 +147,19 @@ class ProductDetailView(DetailView):
 
 class ProductUpdateView(UpdateView):
     model = Product
-    fields = ['name', 'description', 'price', 'stock', 'product_image', 'is_active']
-    template_name = 'dashboard/product_update.html'
-    success_url = reverse_lazy('product_list')
+    form_class = ProductForm
+    template_name = 'dashboard/product_form.html'  # same template as Add
+    success_url = reverse_lazy('product_list')     # redirect after successful update
+
+    # Handle valid form submission
+    def form_valid(self, form):
+        messages.success(self.request, "✅ Product updated successfully!")
+        return super().form_valid(form)
+
+    # Handle invalid form submission
+    def form_invalid(self, form):
+        messages.error(self.request, "⚠️ Please correct the errors below.")
+        return super().form_invalid(form)
     
 # ✅ Delete product
 class ProductDeleteView(DeleteView):

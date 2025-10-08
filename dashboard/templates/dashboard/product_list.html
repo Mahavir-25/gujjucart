@@ -10,7 +10,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h2>Product List</h2>
-                            <a href="{% url 'add_product' %}" class="btn btn-success">Add Product</a>
+                            <button data-url="{% url 'add_product' %}" class="btn btn-success updateproductBtn">Add Product</button>
                         </div>
 
                         <div class="table-responsive">
@@ -44,9 +44,9 @@
                                         <td>{{ product.stock }}</td>
                                         <td>{{ product.is_active|yesno:"Yes,No" }}</td>
                                         <td>
-                                            <a href="{% url 'product_view' product.id %}" class="btn btn-primary btn-sm">View</a>
-                                            <a href="{% url 'product_update' product.id %}" class="btn btn-warning btn-sm">Update</a>
-                                            <a href="{% url 'product_delete' product.id %}" class="btn btn-danger btn-sm">Delete</a>
+                                           <button class="btn btn-primary btn-sm viewProductBtn" data-url="{% url 'product_view' product.id %}">View</button>
+                                            <button class="btn btn-warning btn-sm updateproductBtn" data-url="{% url 'product_update' product.id %}" >Update</button>
+                                            <button class="btn btn-danger btn-sm updateproductBtn" data-url="{% url 'product_delete' product.id %}" >Delete</button>
                                         </td>
                                     </tr>
                                     {% empty %}
@@ -87,26 +87,111 @@
         </div>
     </div>
 </div>
+<!-- Modal for AJAX Product View -->
+<div class="modal fade" id="productViewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body p-0" id="productModalBody">
+        <!-- Product view page will load here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 
 {% endblock %}
 {% block script %} 
+<!-- ✅ CKEditor 5 Classic Build (CDN) -->
+<script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
 <script>
-$(document).ready(function() {
-    $('#producttable').DataTable({
-        "pageLength": 20,
-        "lengthMenu": [10, 20, 30, 40, 50],
-        "paging": true,
-        "searching": true,
-        "ordering": true,
-        "info": true,
-        "columnDefs": [
-            {"orderable": false, "targets": [1, 7]}  // Image & Actions columns not sortable
-        ],
-        "language": {
-            "search": "Filter Products:"
-        }
-    });
-});
+    // Reusable CKEditor initializer
+    function initCKEditor() {
+        const textarea = document.querySelector('#id_description'); // your textarea ID
+        if (textarea) {
+            // Destroy existing instance if any (prevent duplicates)
+            if (textarea.ckeditorInstance) {
+                textarea.ckeditorInstance.destroy()
+                    .catch(error => console.error(error));
+            }
 
-</script>{% endblock script %}
+            ClassicEditor.create(textarea, {
+                toolbar: [
+                    'heading', '|',
+                    'bold', 'italic', 'underline', 'strikethrough', '|',
+                    'bulletedList', 'numberedList', '|',
+                    'link', 'blockQuote', '|',
+                    'undo', 'redo'
+                ]
+            }).then(editor => {
+                textarea.ckeditorInstance = editor; // store instance
+            }).catch(error => {
+                console.error('Error initializing CKEditor:', error);
+            });
+        }
+    }
+
+    // Initialize CKEditor on page load (for static forms)
+    document.addEventListener("DOMContentLoaded", function() {
+        initCKEditor();
+    });
+
+    $(document).ready(function() {
+        // Initialize DataTable
+        $('#producttable').DataTable({
+            "pageLength": 20,
+            "lengthMenu": [10, 20, 30, 40, 50],
+            "paging": true,
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "columnDefs": [
+                {"orderable": false, "targets": [1, 7]}  // Image & Actions columns not sortable
+            ],
+            "language": {
+                "search": "Filter Products:"
+            }
+        });
+
+        // AJAX View Product (unchanged)
+        $('.viewProductBtn').on('click', function() {
+            var viewUrl = $(this).data('url');
+            $.ajax({
+                url: viewUrl,
+                type: 'GET',
+                success: function(response) {
+                    var content = $(response).find('.body-wrapper-inner').html();
+                    $('#productModalBody').html(content);
+                    $('#productViewModal').modal('show');
+                },
+                error: function() {
+                    alert('Error loading product details.');
+                }
+            });
+        });
+
+        // AJAX Update Product (modified to init CKEditor)
+        $('.updateproductBtn').on('click', function() {
+            var viewUrl = $(this).data('url');
+            $.ajax({
+                url: viewUrl,
+                type: 'GET',
+                success: function(response) {
+                    var content = $(response).find('.body-wrapper-inner').html();
+                    $('#productModalBody').html(content);
+                    $('#productViewModal').modal('show');
+
+                    // ✅ Initialize CKEditor on dynamically loaded form
+                    initCKEditor();
+                },
+                error: function() {
+                    alert('Error loading product details.');
+                }
+            });
+        });
+    });
+</script>
+{% endblock script %}
+
 
