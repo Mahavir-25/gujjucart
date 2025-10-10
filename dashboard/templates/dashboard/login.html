@@ -71,9 +71,9 @@
 
       <!-- Right section with Django login form -->
       <div class="col-md-7">
-        <div class="loginbox card border-0 shadow-lg p-5 rounded-4 bg-white">
+        <div class="popup card border-0 shadow-lg p-5 rounded-4 bg-white">
           <h3 class="mb-4 text-center fw-bold">Welcome Back</h3>
-          
+           
           <form method="post" action="{% url 'login' %}" novalidate>
             {% csrf_token %}
             {{ form.non_field_errors }}

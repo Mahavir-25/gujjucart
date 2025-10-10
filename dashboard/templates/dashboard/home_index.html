@@ -55,13 +55,33 @@
 
                 <!-- Right Icons -->
                 <div class="flex items-center space-x-6">
+                  {% if user.is_authenticated %}
+                        <!-- Profile Button -->
+                        <a href="{% url 'profile' %}" class="text-gray-600 hover:text-blue-600 transition-colors flex items-center">
+                            <i class="fas fa-user-circle"></i>
+                            <span class="hidden sm:inline">Profile</span>
+                        </a>
+
+                        <!-- Logout Button -->
+                        <a href="{% url 'logout' %}" class="text-gray-600 hover:text-blue-600 transition-colors flex items-center">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span class="hidden sm:inline">Logout</span>
+                        </a>
+                    {% else %}
                     
                    <button 
-                        class="LoginBtn text-gray-600 hover:text-blue-600 transition-colors flex items-center"
+                        class="PopBtn text-gray-600 hover:text-blue-600 transition-colors flex items-center"
                         data-url="{% url 'login' %}">
                         <i class="fas fa-user"></i>
                         <span class="hidden sm:inline">Login</span> 
                     </button>
+                    <button 
+                        class="PopBtn text-gray-600 hover:text-blue-600 transition-colors flex items-center"
+                        data-url="{% url 'signup' %}">
+                        <i class="fas fa-user-pen"></i>
+                        <span class="hidden sm:inline">signup</span> 
+                    </button>
+                    {% endif %}
 
                     <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors flex items-center space-x-1">
                         <i class="fas fa-heart"></i>
@@ -228,6 +248,7 @@
   </div>
 </div>
 
+
 <!-- 🌐 Footer Section - GujjuCart -->
 <footer class="bg-gray-900 text-gray-300 mt-16">
   <div class="container mx-auto px-6 py-12">
@@ -321,6 +342,13 @@
 
 <!-- Hero Slider Script -->
 <script>
+  
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var myModal = new bootstrap.Modal(document.getElementById('loginErrorModal'));
+        myModal.show();
+    });
+
 const slider = document.getElementById('heroSlider');
 const slides = document.querySelectorAll('.slide');
 const prevBtn = document.getElementById('prevSlide');
@@ -390,14 +418,14 @@ startAutoSlide();
 <!-- ✅ AJAX Login Modal Script -->
 <script>
 $(document).ready(function() {
-    $('.LoginBtn').on('click', function(e) {
+    $('.PopBtn').on('click', function(e) {
         e.preventDefault();
         var viewUrl = $(this).data('url'); // Django login URL
         $.ajax({
             url: viewUrl,
             type: 'GET',
             success: function(response) {
-                var content = $(response).find('.loginbox').html();
+                var content = $(response).find('.popup').html();
                 if (content) {
                     $('#loginModalBody').html(content);
                     var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));

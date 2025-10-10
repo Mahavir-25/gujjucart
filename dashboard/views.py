@@ -11,16 +11,15 @@ from .forms import ForgotPasswordForm, ResetPasswordForm,ProfileUpdateForm
 from django.contrib.auth.models import User
 from dashboard.models import Product
 
-
 class LoginView(FormView):
-    template_name = 'dashboard/login.html'
+    template_name = 'dashboard/login.html'  # fallback, rarely used
     form_class = LoginForm
+    home_index = 'dashboard/home_index.html'
 
     def get_success_url(self):
         user = self.request.user
-        # Redirect based on role
         if getattr(user, 'role', None) == 'u':
-            return reverse_lazy('index')  # replace with your index URL name
+            return reverse_lazy('index')
         else:
             return reverse_lazy('dashboard_index')
 
@@ -30,16 +29,28 @@ class LoginView(FormView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        return super().form_invalid(form)
+        # Pass all errors to home_index template
+        error_list = []
 
-    def form_invalid(self, form):
-        return super().form_invalid(form)
-    
+        # Non-field errors (like invalid credentials)
+        for err in form.non_field_errors():
+            error_list.append(err)
+
+        # Field-specific errors
+        for field in form:
+            for err in field.errors:
+                error_list.append(f"{field.label}: {err}")
+
+        return render(self.request, 'dashboard/home_index.html', {
+        'login_form': form,
+        'login_error': True,
+        'login_error_list': error_list
+        })
 
 class LogoutView(TemplateView):
     def get(self, request, *args, **kwargs):
         logout(request)
-        return redirect('login')
+        return redirect('index')
 
 class DashboardIndexView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/dashboard_index.html"
@@ -72,6 +83,13 @@ class ProfileView(LoginRequiredMixin,TemplateView):
 class SignupView(FormView):
     template_name = 'dashboard/signup.html'
     form_class = SignUpForm
+    def get_success_url(self):
+        user = self.request.user
+        # Redirect based on role
+        if getattr(user, 'role', None) == 'u':
+            return reverse_lazy('index')  # replace with your index URL name
+        else:
+            return reverse_lazy('dashboard_index')
 
     def form_valid(self, form):
         # Save the user instance but don’t commit if using ModelForm
