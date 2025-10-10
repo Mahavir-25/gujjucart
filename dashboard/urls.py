@@ -1,10 +1,11 @@
 
 from django.urls import path
-from dashboard.views import IndexView,SignupView,ProfileView ,ProductUpdateView,ProductDeleteView,ProductDetailView, ProductListView,AddProductView,LoginView,LogoutView,ForgotPasswordView,ResetPasswordView,ProfileUpdateView
+from dashboard.views import IndexView,DashboardIndexView,SignupView,ProfileView ,ProductUpdateView,ProductDeleteView,ProductDetailView, ProductListView,AddProductView,LoginView,LogoutView,ForgotPasswordView,ResetPasswordView,ProfileUpdateView
 
 urlpatterns = [
    
     path('', IndexView.as_view(), name='index'),
+    path('admin-dashboard', DashboardIndexView.as_view(), name='dashboard_index'),
     path('signup', SignupView.as_view(), name='signup'),
     path('login', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),

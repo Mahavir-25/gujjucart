@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECommerce Header & Hero</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap 5.3.3 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* Custom font: Using system sans-serif for clean look (Inter-like) */
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        
+        /* Hero slider transitions */
+        .slide { transition: transform 0.5s ease-in-out; }
+        
+        /* Placeholder images - replace with actual URLs */
+        .hero-bg-1 { background-image: url("{% static 'dashboard/images/backgrounds/gujucartmain.jpg' %}"); }
+        .hero-bg-2 { background-image: url("{% static 'dashboard/images/backgrounds/gujjucartmain2.jpg' %}"); }
+        .hero-bg-3 { background-image: url("{% static 'dashboard/images/backgrounds/gujjucartmain3.jpg' %}"); }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Header -->
+    <header class="sticky top-0 bg-white shadow-md z-50">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="#" class="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors">GujjuCart</a>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="hidden md:flex flex-1 mx-8 max-w-2xl">
+                    <div class="relative w-full">
+                        <input 
+                            type="text" 
+                            placeholder="Search for products, brands, and more..." 
+                            class="w-full px-4 py-2 pr-12 text-gray-700 bg-white border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                        <button class="absolute right-0 top-0 h-full px-4 text-white bg-blue-600 rounded-r-md hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile Search Toggle (hidden on desktop) -->
+                <button class="md:hidden text-gray-600 hover:text-blue-600 transition-colors">
+                    <i class="fas fa-search text-xl"></i>
+                </button>
+
+                <!-- Right Icons -->
+                <div class="flex items-center space-x-6">
+                    
+                   <button 
+                        class="LoginBtn text-gray-600 hover:text-blue-600 transition-colors flex items-center"
+                        data-url="{% url 'login' %}">
+                        <i class="fas fa-user"></i>
+                        <span class="hidden sm:inline">Login</span> 
+                    </button>
+
+                    <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors flex items-center space-x-1">
+                        <i class="fas fa-heart"></i>
+                        <span class="hidden sm:inline">Wishlist</span>
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors flex items-center space-x-1 relative">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="hidden sm:inline">Cart</span>
+                        <span class="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mobile Search Bar (hidden by default) -->
+            <div id="mobileSearch" class="md:hidden hidden mt-4 pb-4 border-t">
+                <div class="relative w-full">
+                    <input 
+                        type="text" 
+                        placeholder="Search for products..." 
+                        class="w-full px-4 py-2 pr-12 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                    <button class="absolute right-0 top-0 h-full px-4 text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative h-screen overflow-hidden">
+        <!-- Slider Container -->
+        <div id="heroSlider" class="absolute inset-0 w-full h-full flex transition-transform duration-500 ease-in-out">
+            <!-- Slide 1 -->
+            <div class="hero-bg-1 bg-cover bg-center bg-no-repeat min-w-full h-full relative flex items-center justify-center slide">
+                <div class="absolute inset-0 bg-black/40"></div>
+                <div class="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-4">Big Sale – Up to 50% Off</h1>
+                    <p class="text-xl md:text-2xl mb-8">Discover amazing deals on your favorite products. Limited time only!</p>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-md text-lg font-semibold transition-colors">
+                        Shop Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="hero-bg-2 bg-cover bg-center bg-no-repeat min-w-full h-full relative flex items-center justify-center slide">
+                <div class="absolute inset-0 bg-black/40"></div>
+                <div class="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-4">New Arrivals Just In</h1>
+                    <p class="text-xl md:text-2xl mb-8">Explore the latest trends and must-have items for every season.</p>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-md text-lg font-semibold transition-colors">
+                        Browse New
+                    </button>
+                </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="hero-bg-3 bg-cover bg-center bg-no-repeat min-w-full h-full relative flex items-center justify-center slide">
+                <div class="absolute inset-0 bg-black/40"></div>
+                <div class="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-4">Free Shipping on All Orders</h1>
+                    <p class="text-xl md:text-2xl mb-8">Enjoy hassle-free shopping with delivery straight to your door.</p>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-md text-lg font-semibold transition-colors">
+                        Learn More
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+
+        <!-- Navigation Arrows -->
+        <button id="prevSlide" class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors z-20">
+            <i class="fas fa-chevron-left text-xl"></i>
+        </button>
+        <button id="nextSlide" class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors z-20">
+            <i class="fas fa-chevron-right text-xl"></i>
+        </button>
+
+        <!-- Slide Indicators (Dots) -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
+            <button class="w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-colors" data-slide="0"></button>
+            <button class="w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-colors" data-slide="1"></button>
+            <button class="w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-colors" data-slide="2"></button>
+        </div>
+    </section>
+    <!-- Featured Categories Section -->
+<section class="py-16 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <!-- Title -->
+    <h2 class="text-3xl font-bold text-gray-800 text-center mb-10">Shop by Category</h2>
+
+    <!-- Category Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+      <!-- Category Card -->
+      <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
+        <img src="https://via.placeholder.com/120x120/3B82F6/FFFFFF?text=Electronics" alt="Electronics" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
+        <h3 class="font-semibold text-gray-700">Electronics</h3>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
+        <img src="https://via.placeholder.com/120x120/F59E0B/FFFFFF?text=Fashion" alt="Fashion" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
+        <h3 class="font-semibold text-gray-700">Fashion</h3>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
+        <img src="https://via.placeholder.com/120x120/10B981/FFFFFF?text=Home" alt="Home" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
+        <h3 class="font-semibold text-gray-700">Home & Kitchen</h3>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
+        <img src="https://via.placeholder.com/120x120/8B5CF6/FFFFFF?text=Beauty" alt="Beauty" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
+        <h3 class="font-semibold text-gray-700">Beauty</h3>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
+        <img src="https://via.placeholder.com/120x120/EF4444/FFFFFF?text=Sports" alt="Sports" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
+        <h3 class="font-semibold text-gray-700">Sports</h3>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
+        <img src="https://via.placeholder.com/120x120/6366F1/FFFFFF?text=Toys" alt="Toys" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
+        <h3 class="font-semibold text-gray-700">Toys</h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Products Section -->
+<section class="py-16 bg-white">
+  <div class="container mx-auto px-4">
+    <!-- Title -->
+    <h2 class="text-3xl font-bold text-gray-800 text-center mb-10">Top Deals for You</h2>
+
+    <!-- Product Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      <!-- Product Card -->
+       {% for product in products %}
+      <div class="bg-white border rounded-xl shadow-sm hover:shadow-lg transition transform hover:-translate-y-1 overflow-hidden">
+        <img src="{{ product.product_image.url }}" alt="Product 1" class="w-full h-56 object-cover">
+        <div class="p-4">
+          <h3 class="font-semibold text-gray-800 mb-2 truncate">{{ product.name }}</h3>
+          <div class="flex items-center mb-2">
+            <span class="text-yellow-400 mr-1"><i class="fas fa-star"></i></span>
+            <span class="text-sm text-gray-600">4.5 (230)</span>
+          </div>
+          <p class="text-gray-800 font-bold text-lg mb-2">${{ product.price }} <span class="text-gray-400 line-through text-sm ml-1">$60000.99</span></p>
+          <button class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-md transition">Add to Cart</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Modal for AJAX Product View -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-body p-4" id="loginModalBody">
+        <!-- Login form will load here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🌐 Footer Section - GujjuCart -->
+<footer class="bg-gray-900 text-gray-300 mt-16">
+  <div class="container mx-auto px-6 py-12">
+    <!-- Top Footer Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+
+      <!-- Brand Info -->
+      <div>
+        <h2 class="text-2xl font-bold text-white mb-4">GujjuCart</h2>
+        <p class="text-sm leading-relaxed">
+          Your one-stop shop for quality products at unbeatable prices.
+          From electronics to fashion — GujjuCart brings Gujarat’s best deals to your doorstep.
+        </p>
+        <!-- Social Links -->
+        <div class="flex space-x-4 mt-4">
+          <a href="#" class="hover:text-white transition">
+            <i class="fab fa-facebook text-xl"></i>
+          </a>
+          <a href="#" class="hover:text-white transition">
+            <i class="fab fa-instagram text-xl"></i>
+          </a>
+          <a href="#" class="hover:text-white transition">
+            <i class="fab fa-twitter text-xl"></i>
+          </a>
+          <a href="#" class="hover:text-white transition">
+            <i class="fab fa-linkedin text-xl"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Customer Service -->
+      <div>
+        <h3 class="text-lg font-semibold text-white mb-4">Customer Service</h3>
+        <ul class="space-y-2">
+          <li><a href="#" class="hover:text-white transition">Help Center</a></li>
+          <li><a href="#" class="hover:text-white transition">Track Order</a></li>
+          <li><a href="#" class="hover:text-white transition">Returns & Refunds</a></li>
+          <li><a href="#" class="hover:text-white transition">Shipping Info</a></li>
+          <li><a href="#" class="hover:text-white transition">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <!-- Company Info -->
+      <div>
+        <h3 class="text-lg font-semibold text-white mb-4">Company</h3>
+        <ul class="space-y-2">
+          <li><a href="#" class="hover:text-white transition">About Us</a></li>
+          <li><a href="#" class="hover:text-white transition">Careers</a></li>
+          <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+          <li><a href="#" class="hover:text-white transition">Terms & Conditions</a></li>
+          <li><a href="#" class="hover:text-white transition">Affiliate Program</a></li>
+        </ul>
+      </div>
+
+      <!-- Newsletter Signup -->
+      <div>
+        <h3 class="text-lg font-semibold text-white mb-4">Stay Updated</h3>
+        <p class="text-sm mb-3">Subscribe to get the latest deals & offers from GujjuCart.</p>
+        <form class="flex">
+          <input type="email" placeholder="Enter your email"
+                 class="w-full px-3 py-2 rounded-l-md focus:outline-none text-gray-800" />
+          <button type="submit"
+                  class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-md text-white transition">
+            Subscribe
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- Divider -->
+    <div class="border-t border-gray-700 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+      <p>© 2025 <span class="text-white font-semibold">GujjuCart</span>. All rights reserved.</p>
+      <div class="flex space-x-4 mt-3 md:mt-0">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" class="h-6">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Mastercard-logo.png" alt="Mastercard" class="h-6">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Paytm_logo.png" alt="Paytm" class="h-6">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/RuPay.svg" alt="RuPay" class="h-6">
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- CKEditor -->
+<script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Hero Slider Script -->
+<script>
+const slider = document.getElementById('heroSlider');
+const slides = document.querySelectorAll('.slide');
+const prevBtn = document.getElementById('prevSlide');
+const nextBtn = document.getElementById('nextSlide');
+const dots = document.querySelectorAll('[data-slide]');
+
+let currentSlide = 0;
+const totalSlides = slides.length;
+let autoSlideInterval;
+
+function updateSlider() {
+    slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+    dots.forEach((dot, index) => {
+        dot.classList.toggle('bg-white', index === currentSlide);
+        dot.classList.toggle('bg-white/50', index !== currentSlide);
+    });
+}
+
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    updateSlider();
+}
+
+function prevSlide() {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    updateSlider();
+}
+
+function startAutoSlide() {
+    autoSlideInterval = setInterval(nextSlide, 5000);
+}
+
+function stopAutoSlide() {
+    clearInterval(autoSlideInterval);
+    setTimeout(startAutoSlide, 10000);
+}
+
+nextBtn.addEventListener('click', () => {
+    nextSlide();
+    stopAutoSlide();
+});
+
+prevBtn.addEventListener('click', () => {
+    prevSlide();
+    stopAutoSlide();
+});
+
+dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => {
+        currentSlide = index;
+        updateSlider();
+        stopAutoSlide();
+    });
+});
+
+// Mobile search toggle
+document.querySelector('.md\\:hidden [class*="fa-search"]').addEventListener('click', () => {
+    const mobileSearch = document.getElementById('mobileSearch');
+    mobileSearch.classList.toggle('hidden');
+});
+
+// Initialize
+updateSlider();
+startAutoSlide();
+</script>
+
+<!-- ✅ AJAX Login Modal Script -->
+<script>
+$(document).ready(function() {
+    $('.LoginBtn').on('click', function(e) {
+        e.preventDefault();
+        var viewUrl = $(this).data('url'); // Django login URL
+        $.ajax({
+            url: viewUrl,
+            type: 'GET',
+            success: function(response) {
+                var content = $(response).find('.loginbox').html();
+                if (content) {
+                    $('#loginModalBody').html(content);
+                    var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                    loginModal.show();
+                } else {
+                    alert('Login form not found in response.');
+                }
+            },
+            error: function() {
+                alert('Error loading login form.');
+            }
+        });
+    });
+});
+</script>
+
+
+</body>
+</html>

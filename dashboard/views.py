@@ -15,15 +15,25 @@ from dashboard.models import Product
 class LoginView(FormView):
     template_name = 'dashboard/login.html'
     form_class = LoginForm
-    success_url = reverse_lazy('index') 
+
+    def get_success_url(self):
+        user = self.request.user
+        # Redirect based on role
+        if getattr(user, 'role', None) == 'u':
+            return reverse_lazy('index')  # replace with your index URL name
+        else:
+            return reverse_lazy('dashboard_index')
 
     def form_valid(self, form):
-        user = form.get_user()  
-        login(self.request, user) 
+        user = form.get_user()
+        login(self.request, user)
         return super().form_valid(form)
 
     def form_invalid(self, form):
-       return super().form_invalid(form)
+        return super().form_invalid(form)
+
+    def form_invalid(self, form):
+        return super().form_invalid(form)
     
 
 class LogoutView(TemplateView):
@@ -31,9 +41,27 @@ class LogoutView(TemplateView):
         logout(request)
         return redirect('login')
 
-class IndexView(LoginRequiredMixin,TemplateView):
-    template_name = "dashboard/index.html"
-    login_url = reverse_lazy('login')
+class DashboardIndexView(LoginRequiredMixin, TemplateView):
+    template_name = "dashboard/dashboard_index.html"
+    
+    
+    login_url = '/login/' 
+    redirect_field_name = 'next'  
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request, "Please login first!")
+        return super().dispatch(request, *args, **kwargs)
+
+class IndexView(TemplateView):
+    template_name = "dashboard/home_index.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # fetch your products
+        context['products'] = Product.objects.filter(is_active=True).order_by('-created_at')[:10]
+        return context
+    
 
 
 
@@ -46,12 +74,24 @@ class SignupView(FormView):
     form_class = SignUpForm
 
     def form_valid(self, form):
-        user = form.save()
+        # Save the user instance but don’t commit if using ModelForm
+        user = form.save(commit=False)
+        
+        # Automatically assign role 'u'
+        user.role = 'u'
+        user.save()  # Save user to database
+        
+        # Authenticate and login
         raw_password = form.cleaned_data['password1']
         user = authenticate(self.request, username=user.username, password=raw_password)
         if user is not None:
-            login(self.request, user)  # ✅ Safe to call now
-            return redirect('index')  # or your dashboard/homepage
+            login(self.request, user)
+            
+            # Redirect based on role (if needed)
+            if getattr(user, 'role', None) == 'u':
+                return redirect('index')
+            else:
+                return redirect('dashboard_index')
         else:
             form.add_error(None, "Authentication failed. Please try logging in manually.")
             return self.form_invalid(form)
