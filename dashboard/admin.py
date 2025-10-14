@@ -1,5 +1,5 @@
 from django.contrib import admin
-from dashboard.models import UserProfile,Product
+from dashboard.models import UserProfile,Product,Wishlist
 from django.utils.html import format_html
 
 
@@ -16,3 +16,8 @@ class ProductAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" width="50" />'.format(obj.product_image.url))
         return "-"
     image_tag.short_description = 'Image'
+@admin.register(Wishlist)
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'created_at')
+    list_filter = ('user', 'product')
+    search_fields = ('user__username', 'product__name')

@@ -1,7 +1,9 @@
+    {% load wishlist_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     {% load static %}
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ECommerce Header & Hero</title>
@@ -25,13 +27,84 @@
 </head>
 <body class="bg-gray-50">
 
+           <!-- Modal for Login -->
+ <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Login</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <form method="POST" action="{% url 'index_login' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="id_username" class="form-label">Username or Email</label>
+            <input type="text" name="username" value="{{ login_form.username.value }}" class="form-control" id="id_username">
+          </div>
+          <div class="mb-3">
+            <label for="id_password" class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" id="id_password">
+
+          </div>
+         
+          
+          <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+ {% if login_form.errors %}
+               
+                  {% for field, errors in login_form.errors.items %}
+                   
+                  {% endfor %}
+             
+              {% elif login_error_list %}
+               
+                  {% for err in login_error_list %}
+                  
+                  {% endfor %}
+                
+              {% endif %}  
+
+
+      <!-- ✅ Toast Container -->
+      <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 2000;">
+        <!-- Success Toast -->
+        <div id="loginSuccessToast" class="toast align-items-center text-white bg-success border-0 rounded-3 shadow-sm" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body fw-semibold">
+              <i class="bi bi-check-circle-fill me-2"></i> Login successful! Welcome back.
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+
+          <!-- Error Toast -->
+          <div id="loginErrorToast" class="toast align-items-center text-white bg-danger border-0 rounded-3 shadow-sm" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+              <div class="toast-body fw-semibold">
+                <i class="bi bi-x-circle-fill me-2"></i> Invalid username or password.
+              </div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+          </div>
+        </div>
+
+
     <!-- Header -->
     <header class="sticky top-0 bg-white shadow-md z-50">
         <nav class="container mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
                 <!-- Logo -->
                 <div class="flex-shrink-0">
-                    <a href="#" class="text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors">GujjuCart</a>
+                    <a href="#">
+                        <img src="{% static 'dashboard/images/logos/gujjucartlogo-removebg-preview.png' %}" 
+                            alt="GujjuCart Logo" 
+                            class="h-10 md:h-14s"> <!-- Adjust height as needed -->
+                    </a>
                 </div>
 
                 <!-- Search Bar -->
@@ -70,11 +143,13 @@
                     {% else %}
                     
                    <button 
-                        class="PopBtn text-gray-600 hover:text-blue-600 transition-colors flex items-center"
-                        data-url="{% url 'login' %}">
+                        class=" PopBtn text-gray-600 hover:text-blue-600 transition-colors flex items-center"
+                        data-url="{% url 'login' %}" data-bs-toggle="modal" data-bs-target="#loginModal">
                         <i class="fas fa-user"></i>
                         <span class="hidden sm:inline">Login</span> 
-                    </button>
+                    </button> 
+                   
+
                     <button 
                         class="PopBtn text-gray-600 hover:text-blue-600 transition-colors flex items-center"
                         data-url="{% url 'signup' %}">
@@ -83,10 +158,14 @@
                     </button>
                     {% endif %}
 
-                    <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors flex items-center space-x-1">
-                        <i class="fas fa-heart"></i>
-                        <span class="hidden sm:inline">Wishlist</span>
-                    </a>
+                  <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors flex items-center space-x-1 relative">
+                      <i class="fas fa-heart text-xl"></i>
+                      <span id="wishlist-count" 
+                            class="absolute -top-2 -right-3 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                          {{ request.user.wishlist.count }}  <!-- initial count -->
+                      </span>
+                      <span class="hidden sm:inline ml-1">Wishlist</span>
+                  </a>
                     <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors flex items-center space-x-1 relative">
                         <i class="fas fa-shopping-cart"></i>
                         <span class="hidden sm:inline">Cart</span>
@@ -94,6 +173,8 @@
                     </a>
                 </div>
             </div>
+   
+
 
             <!-- Mobile Search Bar (hidden by default) -->
             <div id="mobileSearch" class="md:hidden hidden mt-4 pb-4 border-t">
@@ -168,279 +249,295 @@
             <button class="w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-colors" data-slide="2"></button>
         </div>
     </section>
-    <!-- Featured Categories Section -->
-<section class="py-16 bg-gray-50">
-  <div class="container mx-auto px-4">
-    <!-- Title -->
-    <h2 class="text-3xl font-bold text-gray-800 text-center mb-10">Shop by Category</h2>
+          <!-- Featured Categories Section -->
+      <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+          <!-- Title -->
+          <h2 class="text-3xl font-bold text-gray-800 text-center mb-10">Shop by Category</h2>
 
-    <!-- Category Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-      <!-- Category Card -->
-      <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
-        <img src="https://via.placeholder.com/120x120/3B82F6/FFFFFF?text=Electronics" alt="Electronics" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
-        <h3 class="font-semibold text-gray-700">Electronics</h3>
-      </div>
+          <!-- Category Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+            <!-- Category Card -->
+            <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
+              <img src="https://via.placeholder.com/120x120/3B82F6/FFFFFF?text=Electronics" alt="Electronics" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
+              <h3 class="font-semibold text-gray-700">Electronics</h3>
+            </div>
 
-      <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
-        <img src="https://via.placeholder.com/120x120/F59E0B/FFFFFF?text=Fashion" alt="Fashion" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
-        <h3 class="font-semibold text-gray-700">Fashion</h3>
-      </div>
+            <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
+              <img src="https://via.placeholder.com/120x120/F59E0B/FFFFFF?text=Fashion" alt="Fashion" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
+              <h3 class="font-semibold text-gray-700">Fashion</h3>
+            </div>
 
-      <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
-        <img src="https://via.placeholder.com/120x120/10B981/FFFFFF?text=Home" alt="Home" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
-        <h3 class="font-semibold text-gray-700">Home & Kitchen</h3>
-      </div>
+            <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
+              <img src="https://via.placeholder.com/120x120/10B981/FFFFFF?text=Home" alt="Home" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
+              <h3 class="font-semibold text-gray-700">Home & Kitchen</h3>
+            </div>
 
-      <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
-        <img src="https://via.placeholder.com/120x120/8B5CF6/FFFFFF?text=Beauty" alt="Beauty" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
-        <h3 class="font-semibold text-gray-700">Beauty</h3>
-      </div>
+            <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
+              <img src="https://via.placeholder.com/120x120/8B5CF6/FFFFFF?text=Beauty" alt="Beauty" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
+              <h3 class="font-semibold text-gray-700">Beauty</h3>
+            </div>
 
-      <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
-        <img src="https://via.placeholder.com/120x120/EF4444/FFFFFF?text=Sports" alt="Sports" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
-        <h3 class="font-semibold text-gray-700">Sports</h3>
-      </div>
+            <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
+              <img src="https://via.placeholder.com/120x120/EF4444/FFFFFF?text=Sports" alt="Sports" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
+              <h3 class="font-semibold text-gray-700">Sports</h3>
+            </div>
 
-      <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
-        <img src="https://via.placeholder.com/120x120/6366F1/FFFFFF?text=Toys" alt="Toys" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
-        <h3 class="font-semibold text-gray-700">Toys</h3>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Featured Products Section -->
-<section class="py-16 bg-white">
-  <div class="container mx-auto px-4">
-    <!-- Title -->
-    <h2 class="text-3xl font-bold text-gray-800 text-center mb-10">Top Deals for You</h2>
-
-    <!-- Product Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-      <!-- Product Card -->
-       {% for product in products %}
-      <div class="bg-white border rounded-xl shadow-sm hover:shadow-lg transition transform hover:-translate-y-1 overflow-hidden">
-        <img src="{{ product.product_image.url }}" alt="Product 1" class="w-full h-56 object-cover">
-        <div class="p-4">
-          <h3 class="font-semibold text-gray-800 mb-2 truncate">{{ product.name }}</h3>
-          <div class="flex items-center mb-2">
-            <span class="text-yellow-400 mr-1"><i class="fas fa-star"></i></span>
-            <span class="text-sm text-gray-600">4.5 (230)</span>
+            <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 p-6 text-center cursor-pointer">
+              <img src="https://via.placeholder.com/120x120/6366F1/FFFFFF?text=Toys" alt="Toys" class="w-24 h-24 mx-auto rounded-full object-cover mb-4">
+              <h3 class="font-semibold text-gray-700">Toys</h3>
+            </div>
           </div>
-          <p class="text-gray-800 font-bold text-lg mb-2">${{ product.price }} <span class="text-gray-400 line-through text-sm ml-1">$60000.99</span></p>
-          <button class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-md transition">Add to Cart</button>
         </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
+      </section>
 
-<!-- Modal for AJAX Product View -->
-<div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-body p-4" id="loginModalBody">
-        <!-- Login form will load here -->
-      </div>
-    </div>
-  </div>
-</div>
+      <!-- Featured Products Section -->
+      <section class="py-16 bg-white">
+                <div class="container mx-auto px-4">
+                  <!-- Title -->
+                  <h2 class="text-3xl font-bold text-gray-800 text-center mb-10">Top Deals for You</h2>
+
+                  <!-- Product Grid -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                    
+                    <!-- Product Card -->
+                {% for product in products %}
+              <div class="bg-white border rounded-xl shadow-sm hover:shadow-lg transition transform hover:-translate-y-1 overflow-hidden relative">
+                  <img src="{{ product.product_image.url }}" alt="{{ product.name }}" class="w-full h-56 object-cover">
+
+                  <!-- Heart Button -->
+                  <button class="wishlist-btn absolute top-2 right-2 text-2xl transition" data-product-id="{{ product.id }}">
+                      {% if product|in_wishlist:user %}
+                          <i class="fas fa-heart text-red-500"></i>
+                      {% else %}
+                          <i class="far fa-heart text-gray-400"></i>
+                      {% endif %}
+                  </button>
+
+                  <div class="p-4">
+                      <h3 class="font-semibold text-gray-800 mb-2 truncate">{{ product.name }}</h3>
+                      <p class="text-gray-800 font-bold text-lg mb-2">${{ product.price }}</p>
+                      <button class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-md transition">Add to Cart</button>
+                  </div>
+              </div>
+              {% endfor %}
 
 
-<!-- 🌐 Footer Section - GujjuCart -->
-<footer class="bg-gray-900 text-gray-300 mt-16">
-  <div class="container mx-auto px-6 py-12">
-    <!-- Top Footer Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
 
-      <!-- Brand Info -->
-      <div>
-        <h2 class="text-2xl font-bold text-white mb-4">GujjuCart</h2>
-        <p class="text-sm leading-relaxed">
-          Your one-stop shop for quality products at unbeatable prices.
-          From electronics to fashion — GujjuCart brings Gujarat’s best deals to your doorstep.
-        </p>
-        <!-- Social Links -->
-        <div class="flex space-x-4 mt-4">
-          <a href="#" class="hover:text-white transition">
-            <i class="fab fa-facebook text-xl"></i>
-          </a>
-          <a href="#" class="hover:text-white transition">
-            <i class="fab fa-instagram text-xl"></i>
-          </a>
-          <a href="#" class="hover:text-white transition">
-            <i class="fab fa-twitter text-xl"></i>
-          </a>
-          <a href="#" class="hover:text-white transition">
-            <i class="fab fa-linkedin text-xl"></i>
-          </a>
-        </div>
-      </div>
 
-      <!-- Customer Service -->
-      <div>
-        <h3 class="text-lg font-semibold text-white mb-4">Customer Service</h3>
-        <ul class="space-y-2">
-          <li><a href="#" class="hover:text-white transition">Help Center</a></li>
-          <li><a href="#" class="hover:text-white transition">Track Order</a></li>
-          <li><a href="#" class="hover:text-white transition">Returns & Refunds</a></li>
-          <li><a href="#" class="hover:text-white transition">Shipping Info</a></li>
-          <li><a href="#" class="hover:text-white transition">Contact Us</a></li>
-        </ul>
-      </div>
 
-      <!-- Company Info -->
-      <div>
-        <h3 class="text-lg font-semibold text-white mb-4">Company</h3>
-        <ul class="space-y-2">
-          <li><a href="#" class="hover:text-white transition">About Us</a></li>
-          <li><a href="#" class="hover:text-white transition">Careers</a></li>
-          <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
-          <li><a href="#" class="hover:text-white transition">Terms & Conditions</a></li>
-          <li><a href="#" class="hover:text-white transition">Affiliate Program</a></li>
-        </ul>
-      </div>
+                    
+                  </div>
+                </div>
+      </section>
 
-      <!-- Newsletter Signup -->
-      <div>
-        <h3 class="text-lg font-semibold text-white mb-4">Stay Updated</h3>
-        <p class="text-sm mb-3">Subscribe to get the latest deals & offers from GujjuCart.</p>
-        <form class="flex">
-          <input type="email" placeholder="Enter your email"
-                 class="w-full px-3 py-2 rounded-l-md focus:outline-none text-gray-800" />
-          <button type="submit"
-                  class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-md text-white transition">
-            Subscribe
-          </button>
-        </form>
-      </div>
 
-    </div>
 
-    <!-- Divider -->
-    <div class="border-t border-gray-700 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
-      <p>© 2025 <span class="text-white font-semibold">GujjuCart</span>. All rights reserved.</p>
-      <div class="flex space-x-4 mt-3 md:mt-0">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" class="h-6">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Mastercard-logo.png" alt="Mastercard" class="h-6">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Paytm_logo.png" alt="Paytm" class="h-6">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/RuPay.svg" alt="RuPay" class="h-6">
-      </div>
-    </div>
-  </div>
-</footer>
-<!-- CKEditor -->
-<script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
+        <!-- 🌐 Footer Section - GujjuCart -->
+        <footer class="bg-gray-900 text-gray-300 mt-16">
+          <div class="container mx-auto px-6 py-12">
+            <!-- Top Footer Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+              <!-- Brand Info -->
+              <div>
+                <h2 class="text-2xl font-bold text-white mb-4">GujjuCart</h2>
+                <p class="text-sm leading-relaxed">
+                  Your one-stop shop for quality products at unbeatable prices.
+                  From electronics to fashion — GujjuCart brings Gujarat’s best deals to your doorstep.
+                </p>
+                <!-- Social Links -->
+                <div class="flex space-x-4 mt-4">
+                  <a href="#" class="hover:text-white transition">
+                    <i class="fab fa-facebook text-xl"></i>
+                  </a>
+                  <a href="#" class="hover:text-white transition">
+                    <i class="fab fa-instagram text-xl"></i>
+                  </a>
+                  <a href="#" class="hover:text-white transition">
+                    <i class="fab fa-twitter text-xl"></i>
+                  </a>
+                  <a href="#" class="hover:text-white transition">
+                    <i class="fab fa-linkedin text-xl"></i>
+                  </a>
+                </div>
+              </div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+              <!-- Customer Service -->
+              <div>
+                <h3 class="text-lg font-semibold text-white mb-4">Customer Service</h3>
+                <ul class="space-y-2">
+                  <li><a href="#" class="hover:text-white transition">Help Center</a></li>
+                  <li><a href="#" class="hover:text-white transition">Track Order</a></li>
+                  <li><a href="#" class="hover:text-white transition">Returns & Refunds</a></li>
+                  <li><a href="#" class="hover:text-white transition">Shipping Info</a></li>
+                  <li><a href="#" class="hover:text-white transition">Contact Us</a></li>
+                </ul>
+              </div>
 
-<!-- Hero Slider Script -->
+              <!-- Company Info -->
+              <div>
+                <h3 class="text-lg font-semibold text-white mb-4">Company</h3>
+                <ul class="space-y-2">
+                  <li><a href="#" class="hover:text-white transition">About Us</a></li>
+                  <li><a href="#" class="hover:text-white transition">Careers</a></li>
+                  <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                  <li><a href="#" class="hover:text-white transition">Terms & Conditions</a></li>
+                  <li><a href="#" class="hover:text-white transition">Affiliate Program</a></li>
+                </ul>
+              </div>
+
+              <!-- Newsletter Signup -->
+              <div>
+                <h3 class="text-lg font-semibold text-white mb-4">Stay Updated</h3>
+                <p class="text-sm mb-3">Subscribe to get the latest deals & offers from GujjuCart.</p>
+                <form class="flex">
+                  <input type="email" placeholder="Enter your email"
+                        class="w-full px-3 py-2 rounded-l-md focus:outline-none text-gray-800" />
+                  <button type="submit"
+                          class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-md text-white transition">
+                    Subscribe
+                  </button>
+                </form>
+              </div>
+
+            </div>
+
+            <!-- Divider -->
+            <div class="border-t border-gray-700 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+              <p>© 2025 <span class="text-white font-semibold">GujjuCart</span>. All rights reserved.</p>
+              <div class="flex space-x-4 mt-3 md:mt-0">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" class="h-6">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Mastercard-logo.png" alt="Mastercard" class="h-6">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Paytm_logo.png" alt="Paytm" class="h-6">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a0/RuPay.svg" alt="RuPay" class="h-6">
+              </div>
+            </div>
+          </div>
+        </footer>
+        <!-- CKEditor -->
+        <script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
+
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Hero Slider Script -->
 <script>
-  
+document.addEventListener('DOMContentLoaded', () => {
+    /***********************
+     * Wishlist Heart Toggle & Count
+     * Sends POST request to toggle wishlist and updates heart icon and badge in real-time
+     ***********************/
+    const wishlistButtons = document.querySelectorAll('.wishlist-btn');
+    const wishlistCountEl = document.getElementById('wishlist-count');
 
-    document.addEventListener('DOMContentLoaded', function() {
-        var myModal = new bootstrap.Modal(document.getElementById('loginErrorModal'));
-        myModal.show();
-    });
+    wishlistButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const productId = button.dataset.productId;
+            const icon = button.querySelector('i');
 
-const slider = document.getElementById('heroSlider');
-const slides = document.querySelectorAll('.slide');
-const prevBtn = document.getElementById('prevSlide');
-const nextBtn = document.getElementById('nextSlide');
-const dots = document.querySelectorAll('[data-slide]');
-
-let currentSlide = 0;
-const totalSlides = slides.length;
-let autoSlideInterval;
-
-function updateSlider() {
-    slider.style.transform = `translateX(-${currentSlide * 100}%)`;
-    dots.forEach((dot, index) => {
-        dot.classList.toggle('bg-white', index === currentSlide);
-        dot.classList.toggle('bg-white/50', index !== currentSlide);
-    });
-}
-
-function nextSlide() {
-    currentSlide = (currentSlide + 1) % totalSlides;
-    updateSlider();
-}
-
-function prevSlide() {
-    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-    updateSlider();
-}
-
-function startAutoSlide() {
-    autoSlideInterval = setInterval(nextSlide, 5000);
-}
-
-function stopAutoSlide() {
-    clearInterval(autoSlideInterval);
-    setTimeout(startAutoSlide, 10000);
-}
-
-nextBtn.addEventListener('click', () => {
-    nextSlide();
-    stopAutoSlide();
-});
-
-prevBtn.addEventListener('click', () => {
-    prevSlide();
-    stopAutoSlide();
-});
-
-dots.forEach((dot, index) => {
-    dot.addEventListener('click', () => {
-        currentSlide = index;
-        updateSlider();
-        stopAutoSlide();
-    });
-});
-
-// Mobile search toggle
-document.querySelector('.md\\:hidden [class*="fa-search"]').addEventListener('click', () => {
-    const mobileSearch = document.getElementById('mobileSearch');
-    mobileSearch.classList.toggle('hidden');
-});
-
-// Initialize
-updateSlider();
-startAutoSlide();
-</script>
-
-<!-- ✅ AJAX Login Modal Script -->
-<script>
-$(document).ready(function() {
-    $('.PopBtn').on('click', function(e) {
-        e.preventDefault();
-        var viewUrl = $(this).data('url'); // Django login URL
-        $.ajax({
-            url: viewUrl,
-            type: 'GET',
-            success: function(response) {
-                var content = $(response).find('.popup').html();
-                if (content) {
-                    $('#loginModalBody').html(content);
-                    var loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-                    loginModal.show();
-                } else {
-                    alert('Login form not found in response.');
+            // Use fetch to send POST to toggle wishlist
+            fetch(`/toggle-wishlist/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'added') {
+                    icon.classList.remove('far', 'text-gray-400');
+                    icon.classList.add('fas', 'text-red-500');
+                } else if (data.status === 'removed') {
+                    icon.classList.remove('fas', 'text-red-500');
+                    icon.classList.add('far', 'text-gray-400');
                 }
-            },
-            error: function() {
-                alert('Error loading login form.');
-            }
+
+                // Update wishlist count badge dynamically
+                if (wishlistCountEl && data.wishlist_count !== undefined) {
+                    wishlistCountEl.textContent = data.wishlist_count;
+                }
+            })
+            .catch(error => console.error('Wishlist toggle error:', error));
         });
     });
+
+    /***********************
+     * Hero Slider
+     ***********************/
+    const slider = document.getElementById('heroSlider');
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.getElementById('prevSlide');
+    const nextBtn = document.getElementById('nextSlide');
+    const dots = document.querySelectorAll('[data-slide]');
+
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+    let autoSlideInterval;
+
+    function updateSlider() {
+        if(slider){
+            slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('bg-white', index === currentSlide);
+                dot.classList.toggle('bg-white/50', index !== currentSlide);
+            });
+        }
+    }
+
+    function nextSlide() {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        updateSlider();
+    }
+
+    function prevSlide() {
+        currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+        updateSlider();
+    }
+
+    function startAutoSlide() {
+        autoSlideInterval = setInterval(nextSlide, 5000);
+    }
+
+    function stopAutoSlide() {
+        clearInterval(autoSlideInterval);
+        setTimeout(startAutoSlide, 10000);
+    }
+
+    if(nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); stopAutoSlide(); });
+    if(prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); stopAutoSlide(); });
+
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            currentSlide = index;
+            updateSlider();
+            stopAutoSlide();
+        });
+    });
+
+    updateSlider();
+    startAutoSlide();
+
+    /***********************
+     * Mobile Search Toggle
+     ***********************/
+    const mobileSearchBtn = document.querySelector('.md\\:hidden [class*="fa-search"]');
+    if (mobileSearchBtn) {
+        mobileSearchBtn.addEventListener('click', () => {
+            const mobileSearch = document.getElementById('mobileSearch');
+            if (mobileSearch) mobileSearch.classList.toggle('hidden');
+        });
+    }
 });
 </script>
+
+
+
 
 
 </body>

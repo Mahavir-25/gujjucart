@@ -29,3 +29,17 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    def is_in_wishlist(self, user):
+        if user.is_authenticated:
+            return self.wishlisted_by.filter(user=user).exists()
+        return False
+class Wishlist(models.Model):
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="wishlist")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="wishlisted_by")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'product')
+
+    def __str__(self):
+        return f"{self.user.username} ❤️ {self.product.name}"

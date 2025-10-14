@@ -1,20 +1,42 @@
-from django.views.generic import TemplateView,CreateView,ListView,DetailView,DeleteView
+from django.views.generic import TemplateView,CreateView,ListView,DetailView,DeleteView,View
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView,UpdateView,FormView
 from .forms import SignUpForm,LoginForm,ProductForm
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from .forms import ForgotPasswordForm, ResetPasswordForm,ProfileUpdateForm
 from django.contrib.auth.models import User
-from dashboard.models import Product
+from dashboard.models import Product,Wishlist
+from django.http import JsonResponse
 
-class LoginView(FormView):
-    template_name = 'dashboard/login.html'  # fallback, rarely used
+class ToggleWishlistView(LoginRequiredMixin, View):
+    login_url = 'index_login'
+
+    def post(self, request, product_id, *args, **kwargs):
+        product = get_object_or_404(Product, id=product_id)
+        wishlist_item, created = Wishlist.objects.get_or_create(user=request.user, product=product)
+
+        if not created:
+            wishlist_item.delete()
+            status = 'removed'
+        else:
+            status = 'added'
+
+        # ✅ Get updated wishlist count for the logged-in user
+        wishlist_count = Wishlist.objects.filter(user=request.user).count()
+
+        return JsonResponse({
+            'status': status,
+            'product_id': product.id,
+            'wishlist_count': wishlist_count
+        })
+        
+class IndexLoginview(FormView):
+    template_name = 'dashboard/home_index.html'
     form_class = LoginForm
-    home_index = 'dashboard/home_index.html'
 
     def get_success_url(self):
         user = self.request.user
@@ -26,26 +48,71 @@ class LoginView(FormView):
     def form_valid(self, form):
         user = form.get_user()
         login(self.request, user)
+        messages.success(self.request, "✅ Login successful! Welcome back.")
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        # Pass all errors to home_index template
         error_list = []
 
-        # Non-field errors (like invalid credentials)
+        # Collect non-field errors
         for err in form.non_field_errors():
             error_list.append(err)
 
-        # Field-specific errors
+        # Collect field-specific errors
         for field in form:
             for err in field.errors:
                 error_list.append(f"{field.label}: {err}")
 
-        return render(self.request, 'dashboard/home_index.html', {
-        'login_form': form,
-        'login_error': True,
-        'login_error_list': error_list
-        })
+        # ✅ Re-render home_index.html with form and errors
+        return render(
+            self.request,
+            self.template_name,
+            {
+                'form': form,
+                'login_error': True,
+                'login_error_list': error_list,
+            }
+        )
+
+        
+
+class LoginView(FormView):
+    template_name = 'dashboard/login.html'  # fallback
+    form_class = LoginForm
+    
+
+    # def get_success_url(self):
+    #     user = self.request.user
+    #     if getattr(user, 'role', None) == 'u':
+    #         return reverse_lazy('index')
+    #     else:
+    #         return reverse_lazy('dashboard_index')
+
+    # def form_valid(self, form):
+    #     user = form.get_user()
+    #     login(self.request, user)
+    #     # ✅ show success message using Django messages framework
+    #     messages.success(self.request, "✅ Login successful! Welcome back.")
+    #     return super().form_valid(form)
+
+    # def form_invalid(self, form):
+    #     # Gather all errors
+    #     error_list = []
+
+    #     for err in form.non_field_errors():
+    #         error_list.append(err)
+
+    #     for field in form:
+    #         for err in field.errors:
+    #             error_list.append(f"{field.label}: {err}")
+
+    #     # ✅ re-render home_index.html with form + errors
+    #     return render(self.request,{
+    #         'form': form,
+    #         'login_error': True,
+    #         'login_error_list': error_list,
+    #     })
+
 
 class LogoutView(TemplateView):
     def get(self, request, *args, **kwargs):
@@ -71,8 +138,15 @@ class IndexView(TemplateView):
         context = super().get_context_data(**kwargs)
         # fetch your products
         context['products'] = Product.objects.filter(is_active=True).order_by('-created_at')[:10]
+
+        # wishlist count for logged-in user
+        if self.request.user.is_authenticated:
+            user = self.request.user
+            context['wishlist_count'] = Wishlist.objects.filter(user=user).count()
+        else:
+            context['wishlist_count'] = 0
+
         return context
-    
 
 
 
