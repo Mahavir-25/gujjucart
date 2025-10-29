@@ -1,0 +1,243 @@
+{% load static %}
+ 
+ <!-- Modal -->
+              <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered modal-lg">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title" id="authModalTitle">Login</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                          </div>
+                          <div class="modal-body p-4">
+                              <!-- Login Form -->
+                              <form id="loginForm" method="POST" action="{% url 'index_login' %}">
+                                  {% csrf_token %}
+                                  <div class="mb-3">
+                                      <label for="id_username" class="form-label">Username or Email</label>
+                                      <input type="text" name="username" value="{{ login_form.username.value }}" class="form-control" id="id_username">
+                                  </div>
+                                  <div class="mb-3">
+                                      <label for="id_password" class="form-label">Password</label>
+                                      <input type="password" name="password" class="form-control" id="id_password">
+                                  </div>
+                                  <button type="submit" class="btn btn-primary w-100">Login</button>
+                              </form>
+
+                         
+
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+
+               <div class="modal fade" id="signupModal" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered modal-lg">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title" id="authModalTitle">Signup</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                          </div>
+                          <div class="modal-body p-4">
+                                   <!-- Signup Form -->
+                              <form id="signupForm" method="POST" action="{% url 'signup' %}" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                
+                                <div class="mb-3">
+                                    <label for="id_first_name" class="form-label">First Name</label>
+                                    <input type="text" name="first_name" class="form-control" id="id_first_name" value="{{ signup_form.first_name.value|default_if_none:'' }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="id_last_name" class="form-label">Last Name</label>
+                                    <input type="text" name="last_name" class="form-control" id="id_last_name" value="{{ signup_form.last_name.value|default_if_none:'' }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="id_email" class="form-label">Email</label>
+                                    <input type="email" name="email" class="form-control" id="id_email" value="{{ signup_form.email.value|default_if_none:'' }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="id_phone" class="form-label">Phone</label>
+                                    <input type="text" name="phone" class="form-control" id="id_phone" value="{{ signup_form.phone.value|default_if_none:'' }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="id_password1" class="form-label">Password</label>
+                                    <input type="password" name="password1" class="form-control" id="id_password1">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="id_password2" class="form-label">Confirm Password</label>
+                                    <input type="password" name="password2" class="form-control" id="id_password2">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="id_profile_image" class="form-label">Profile Image</label>
+                                    <input type="file" name="profile_image" class="form-control" id="id_profile_image">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100">Signup</button>
+                            </form>
+                         
+
+                          </div>
+                      </div>
+                  </div>
+              </div>
+<!-- Toast Container (outside modal) -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:2000;">
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'success' %}
+        <div class="toast align-items-center text-white bg-success border-0" 
+             role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+          </div>
+        </div>
+      {% elif message.tags == 'error' %}
+      <div class="toast align-items-center text-white bg-danger border-0" 
+             role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+          </div>
+        </div>
+        {% endif%}
+    {% endfor %}
+  {% endif %}
+</div>
+
+
+            
+
+
+    <!-- Header -->
+      <header class="sticky top-0 bg-white shadow-md z-50">
+          <nav class="container mx-auto px-4 py-4">
+              <div class="flex items-center justify-between">
+                  <!-- Logo -->
+                  <div class="flex-shrink-0">
+                      <a href="#">
+                          <img src="{% static 'dashboard/images/logos/gujjucartlogo-removebg-preview.png' %}" 
+                              alt="GujjuCart Logo" 
+                              class="h-10 md:h-14s"> <!-- Adjust height as needed -->
+                      </a>
+                  </div>
+
+                  <!-- Search Bar -->
+                  <div class="hidden md:flex flex-1 mx-8 max-w-2xl">
+                      <div class="relative w-full">
+                          <input 
+                              type="text" 
+                              placeholder="Search for products, brands, and more..." 
+                              class="w-full px-4 py-2 pr-12 text-gray-700 bg-white border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          >
+                          <button class="absolute right-0 top-0 h-full px-4 text-white bg-blue-600 rounded-r-md hover:bg-blue-700 transition-colors">
+                              <i class="fas fa-search"></i>
+                          </button>
+                      </div>
+                  </div>
+
+                  <!-- Mobile Search Toggle (hidden on desktop) -->
+                  <button class="md:hidden text-gray-600 hover:text-blue-600 transition-colors">
+                      <i class="fas fa-search text-xl"></i>
+                  </button>
+
+                  <!-- Right Icons -->
+                  <div class="flex items-center space-x-6">
+                    {% if user.is_authenticated %}
+                          <!-- Profile Button -->
+                          <a href="{% url 'user_profile' %}" class="text-gray-600 hover:text-blue-600 transition-colors flex items-center">
+                              <i class="fas fa-user-circle"></i>
+                              <span class="hidden sm:inline">Profile</span>
+                          </a>
+
+                          <!-- Logout Button -->
+                          <a href="{% url 'logout' %}" class="text-gray-600 hover:text-blue-600 transition-colors flex items-center">
+                              <i class="fas fa-sign-out-alt"></i>
+                              <span class="hidden sm:inline">Logout</span>
+                          </a>
+                      {% else %}
+                      
+                    <button 
+                          class="  text-gray-600 hover:text-blue-600 transition-colors flex items-center"
+                           data-bs-toggle="modal" data-bs-target="#authModal"  data-form="login">
+                          <i class="fas fa-user"></i>
+                          <span class="hidden sm:inline">Login</span> 
+                      </button> 
+                    
+
+                    <button 
+                        class="text-gray-600 hover:text-blue-600 transition-colors flex items-center"
+                        data-bs-toggle="modal" data-bs-target="#signupModal" data-form="signup">
+                        <i class="fas fa-user-pen"></i>
+                        <span class="hidden sm:inline">Signup</span> 
+                    </button>
+                      {% endif %}
+
+                    <a href="javascript:void(0);" 
+                    id="wishlistToggle"
+                    class="text-gray-600 hover:text-blue-600 transition-colors flex items-center space-x-1 relative">
+
+                    <i class="fas fa-heart text-xl"></i>
+
+                    {% if request.user.is_authenticated %}
+                    <span id="wishlist-count"
+                            class="absolute -top-2 -right-3 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {{ request.user.wishlist.count }}
+                    </span>
+                    {% endif %}
+
+                    <span class="hidden sm:inline ml-1">Wishlist</span>
+                    </a>
+                           <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors flex items-center space-x-1 relative">
+                          <i class="fas fa-shopping-cart"></i>
+                          <span class="hidden sm:inline">Cart</span>
+                          <span class="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                      </a>
+                  </div>
+              </div>
+    
+
+
+              <!-- Mobile Search Bar (hidden by default) -->
+              <div id="mobileSearch" class="md:hidden hidden mt-4 pb-4 border-t">
+                  <div class="relative w-full">
+                      <input 
+                          type="text" 
+                          placeholder="Search for products..." 
+                          class="w-full px-4 py-2 pr-12 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                      <button class="absolute right-0 top-0 h-full px-4 text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors">
+                          <i class="fas fa-search"></i>
+                      </button>
+                  </div>
+              </div>
+          </nav>
+      </header>
+         <!-- wishlist sidebar -->
+            <div id="miniWishlistSidebar" 
+                class="fixed right-0 top-0 h-full w-60 bg-sky-100 shadow-lg transform translate-x-full transition-transform z-50">
+                
+                <div class="bg-sky-500 text-white font-semibold px-4 py-3 flex justify-between items-center">
+                    <span>My Wishlist</span>
+                    <button id="closeWishlist" class="text-white hover:text-gray-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Add id here so JS can inject items -->
+                <div id="wishlist-items" class="p-3 space-y-2 overflow-y-auto h-[calc(100%-48px)]">
+                    <p class="text-gray-500 text-sm text-center">Loading...</p>
+                </div>
+            </div>
+
+         <!-- wishlist sidebar -->

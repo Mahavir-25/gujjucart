@@ -12,6 +12,20 @@ from django.contrib.auth.models import User
 from dashboard.models import Product,Wishlist
 from django.http import JsonResponse
 
+
+class GetWishlistView(LoginRequiredMixin, View):
+    def get(self, request):
+        wishlist_items = request.user.wishlist.all()
+        data = [
+            {
+                'name': item.product.name,
+                'price': str(item.product.price),
+                'image': item.product.product_image.url
+            }
+            for item in wishlist_items
+        ]
+        return JsonResponse({'wishlist': data})
+
 class ToggleWishlistView(LoginRequiredMixin, View):
     login_url = 'index_login'
 
@@ -48,7 +62,7 @@ class IndexLoginview(FormView):
     def form_valid(self, form):
         user = form.get_user()
         login(self.request, user)
-        messages.success(self.request, "✅ Login successful! Welcome back.")
+        messages.success(self.request, "Login successful! Welcome back.")
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -57,13 +71,16 @@ class IndexLoginview(FormView):
         # Collect non-field errors
         for err in form.non_field_errors():
             error_list.append(err)
+            messages.error(self.request, err)  # show as red toast
 
         # Collect field-specific errors
         for field in form:
             for err in field.errors:
-                error_list.append(f"{field.label}: {err}")
+                error_text = f"{field.label}: {err}"
+                error_list.append(error_text)
+                messages.error(self.request, error_text)  # show as red toast
 
-        # ✅ Re-render home_index.html with form and errors
+        # Re-render template with the form
         return render(
             self.request,
             self.template_name,
@@ -74,6 +91,46 @@ class IndexLoginview(FormView):
             }
         )
 
+class IndexSignupView(FormView):
+    template_name = 'dashboard/home_index.html'
+    form_class = SignUpForm
+
+    def get_success_url(self):
+        user = self.request.user
+        if getattr(user, 'role', None) == 'u':
+            return reverse_lazy('index')
+        else:
+            return reverse_lazy('dashboard_index')
+
+    def form_valid(self, form):
+        user = form.save()  # Save the new user
+        login(self.request, user)  # Automatically log them in
+        messages.success(self.request, "✅ Signup successful! Welcome aboard.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        errors = []  # Collect errors like in login view
+
+        # Non-field errors
+        for err in form.non_field_errors():
+            errors.append(err)
+            messages.error(self.request, err) 
+
+        # Field-specific errors
+        for field in form:
+            for err in field.errors:
+                errors.append(f"{field.label}: {err}")
+
+        # Re-render home_index.html with form and errors
+        return render(
+            self.request,
+            self.template_name,
+            {
+                'signup_form': form,
+                'signup_error': True,
+                'signup_error_list': errors,
+            }
+        )
         
 
 class LoginView(FormView):
@@ -136,17 +193,26 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # fetch your products
+        # Fetch active products
         context['products'] = Product.objects.filter(is_active=True).order_by('-created_at')[:10]
 
-        # wishlist count for logged-in user
+        # Wishlist info
         if self.request.user.is_authenticated:
             user = self.request.user
-            context['wishlist_count'] = Wishlist.objects.filter(user=user).count()
+            user_wishlist = Wishlist.objects.filter(user=user)
+            context['wishlist_count'] = user_wishlist.count()
+            # List of product IDs for template checking
+            context['wishlist_product_ids'] = list(user_wishlist.values_list('product_id', flat=True))
         else:
             context['wishlist_count'] = 0
+            context['wishlist_product_ids'] = []
 
         return context
+    
+class UserProfileView(LoginRequiredMixin,TemplateView):
+    template_name = "dashboard/user_profile.html"
+    login_url = reverse_lazy('login')
+
 
 
 
