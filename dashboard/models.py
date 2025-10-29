@@ -18,6 +18,7 @@ class UserProfile(AbstractUser):
     
 class Product(models.Model):
     name = models.CharField(max_length=250)
+    slug = models.SlugField(unique=True, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     product_image = models.ImageField(upload_to="products/", blank=True, null=True)
@@ -43,3 +44,9 @@ class Wishlist(models.Model):
 
     def __str__(self):
         return f"{self.user.username} ❤️ {self.product.name}"
+
+class cart(models.Model):
+    user=models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    Product=models.ForeignKey(Product,on_delete=models.CASCADE)
+    Product_qty=models.IntegerField(null=False,blank=False)
+    created_at=models.DateTimeField(auto_now_add=True)

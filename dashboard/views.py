@@ -213,6 +213,13 @@ class UserProfileView(LoginRequiredMixin,TemplateView):
     template_name = "dashboard/user_profile.html"
     login_url = reverse_lazy('login')
 
+class UserProductDetailView(DetailView):
+    model = Product
+    template_name = 'dashboard/index_product_details.html'
+    context_object_name = 'product'
+
+    def get_object(self):
+        return get_object_or_404(Product, slug=self.kwargs['slug'], is_active=True)
 
 
 
@@ -364,3 +371,16 @@ class ProductDeleteView(DeleteView):
     model = Product
     template_name = 'dashboard/product_delete.html'
     success_url = reverse_lazy('product_list')
+
+
+class AddToCartView(View):
+    def post(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
+        
+        # Example simple session cart
+        cart = request.session.get('cart', {})
+        cart[str(product.id)] = cart.get(str(product.id), 0) + 1
+        request.session['cart'] = cart
+
+        messages.success(request, f"{product.name} added to your cart!")
+        return redirect('user_product_detail', slug=product.slug)

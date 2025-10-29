@@ -111,7 +111,9 @@
                     <!-- Product Card -->
                 {% for product in products %}
               <div class="bg-white border rounded-xl shadow-sm hover:shadow-lg transition transform hover:-translate-y-1 overflow-hidden relative">
-                  <img src="{{ product.product_image.url }}" alt="{{ product.name }}" class="w-full h-56 object-cover">
+                  <a href="{% url 'user_product_detail' product.slug %}">
+                       <img src="{{ product.product_image.url }}" alt="{{ product.name }}" class="w-full h-56 object-cover">
+                  </a>
                 <button class="wishlist-btn absolute top-2 right-2 text-2xl transition" 
                         data-product-id="{{ product.id }}"
                         {% if not user.is_authenticated %}

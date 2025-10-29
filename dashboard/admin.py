@@ -1,9 +1,10 @@
 from django.contrib import admin
-from dashboard.models import UserProfile,Product,Wishlist
+from dashboard.models import UserProfile,Product,Wishlist,cart
 from django.utils.html import format_html
 
 
 admin.site.register(UserProfile)
+admin.site.register(cart)
 
 
 @admin.register(Product)
