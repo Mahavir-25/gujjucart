@@ -1,43 +1,69 @@
 $(document).ready(function () {
+
+    // --- Update cart count dynamically ---
+    function updateCartCount() {
+        fetch('/get-cart-count/')
+            .then(response => response.json())
+            .then(data => {
+                const cartCountEl = document.getElementById('cart-count');
+                if (cartCountEl) {
+                    cartCountEl.textContent = data.cart_count;
+                }
+            })
+            .catch(error => console.error('Error fetching cart count:', error));
+    }
+
+    // --- Increment quantity ---
     $('.increment-btn').click(function (e) {
         e.preventDefault();
-        var qty = $(this).closest('.input-group').find('.qty-input');
-        var value = parseInt(qty.val());
-        value = isNaN(value) ? 1 : value;
-        if (value < 10) { // optional max limit
-            qty.val(value + 1);
+        let qtyInput = $(this).closest('.input-group').find('.qty-input');
+        let currentVal = parseInt(qtyInput.val());
+        if (!isNaN(currentVal) && currentVal < 10) {
+            qtyInput.val(currentVal + 1);
         }
     });
 
+    // --- Decrement quantity ---
     $('.decrement-btn').click(function (e) {
         e.preventDefault();
-        var qty = $(this).closest('.input-group').find('.qty-input');
-        var value = parseInt(qty.val());
-
-        value = isNaN(value) ? 1 : value;
-        if (value > 1) {
-            qty.val(value - 1);
+        let qtyInput = $(this).closest('.input-group').find('.qty-input');
+        let currentVal = parseInt(qtyInput.val());
+        if (!isNaN(currentVal) && currentVal > 1) {
+            qtyInput.val(currentVal - 1);
         }
     });
-    $('.addToCartBtn').click(function (e){
+
+    // --- Add to Cart ---
+    $('.addToCartBtn').click(function (e) {
         e.preventDefault();
-        var product_id = $('.prod_id').val();
-        var product_qty = $('.qty_input').val();
-        var token=$('input[name=csrfmiddlewaretoken]').val();
+
+        let parentDiv = $(this).closest('.product-data');
+        let product_id = parentDiv.find('.prod_id').val();
+        let product_qty = parentDiv.find('.qty-input').val();
+        let token = $('input[name=csrfmiddlewaretoken]').val();
+
+        if (!product_id) {
+            console.error("❌ Product ID not found. Check your HTML structure.");
+            return;
+        }
+
         $.ajax({
-            method:"POST",
-            url:"/add-to-cart",
-            data:{
-                'product_id':product_id,
-                'product_qty':product_qty,
-                csrfmiddlewaretoken:token
+            method: "POST",
+            url: `/add-to-cart/${product_id}/`,
+            data: {
+                'product_qty': product_qty,
+                csrfmiddlewaretoken: token
             },
-            dataType:"dataType",
-            success:function(response){
-
+            dataType: "json",
+            success: function(response) {
+                console.log(response);
+                alert(response.message);
+                updateCartCount();  // 🔥 Live update cart count
+            },
+            error: function(xhr) {
+                console.error("Error:", xhr.responseText);
             }
-
-        })
+        });
     });
 
 });

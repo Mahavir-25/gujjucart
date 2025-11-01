@@ -46,7 +46,14 @@ class Wishlist(models.Model):
         return f"{self.user.username} ❤️ {self.product.name}"
 
 class cart(models.Model):
-    user=models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    Product=models.ForeignKey(Product,on_delete=models.CASCADE)
-    Product_qty=models.IntegerField(null=False,blank=False)
-    created_at=models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        UserProfile,
+        on_delete=models.CASCADE,
+        related_name='cart'
+    )
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product_qty = models.IntegerField(null=False, blank=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} 🛒 {self.product.name}"

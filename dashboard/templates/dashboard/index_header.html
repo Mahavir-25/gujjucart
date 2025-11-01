@@ -175,7 +175,7 @@
                       </button> 
                     
 
-                    <button 
+                    <button
                         class="text-gray-600 hover:text-blue-600 transition-colors flex items-center"
                         data-bs-toggle="modal" data-bs-target="#signupModal" data-form="signup">
                         <i class="fas fa-user-pen"></i>
@@ -196,13 +196,18 @@
                     </span>
                     {% endif %}
 
+
                     <span class="hidden sm:inline ml-1">Wishlist</span>
                     </a>
-                           <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors flex items-center space-x-1 relative">
-                          <i class="fas fa-shopping-cart"></i>
-                          <span class="hidden sm:inline">Cart</span>
-                          <span class="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
-                      </a>
+                           <a href="{% url 'cart_page' %}" 
+                            class="text-gray-600 hover:text-blue-600 transition-colors flex items-center space-x-1 relative">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span class="hidden sm:inline">Cart</span>
+                                <span id="cart-count" 
+                                    class="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                    {{ request.user.cart.count }}
+                                </span>
+                            </a>
                   </div>
               </div>
     

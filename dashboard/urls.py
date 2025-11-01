@@ -1,6 +1,6 @@
 
 from django.urls import path
-from dashboard.views import IndexView,AddToCartView,UserProductDetailView,GetWishlistView,UserProfileView,ToggleWishlistView,IndexLoginview,IndexSignupView,DashboardIndexView,SignupView,ProfileView ,ProductUpdateView,ProductDeleteView,ProductDetailView, ProductListView,AddProductView,LoginView,LogoutView,ForgotPasswordView,ResetPasswordView,ProfileUpdateView
+from dashboard.views import IndexView,CartPageView,GetCartCountView,AddToCartView,UserProductDetailView,GetWishlistView,UserProfileView,ToggleWishlistView,IndexLoginview,IndexSignupView,DashboardIndexView,SignupView,ProfileView ,ProductUpdateView,ProductDeleteView,ProductDetailView, ProductListView,AddProductView,LoginView,LogoutView,ForgotPasswordView,ResetPasswordView,ProfileUpdateView
 
 urlpatterns = [
    
@@ -23,7 +23,8 @@ urlpatterns = [
     path('product/<int:pk>/delete/', ProductDeleteView.as_view(), name='product_delete'),
     path('toggle-wishlist/<int:product_id>/', ToggleWishlistView.as_view(), name='toggle_wishlist'),  
     path('get-wishlist/', GetWishlistView.as_view(), name='get_wishlist'),
-    path('product/<slug:slug>/', UserProductDetailView.as_view(), name='user_product_detail'),
-    path('add-to-cart/<int:pk>/', AddToCartView.as_view(), name='add_to_cart'),
+    path('get-cart-count/', GetCartCountView.as_view(), name='get_cart_count'),    path('product/<slug:slug>/', UserProductDetailView.as_view(), name='user_product_detail'),
+    path('add-to-cart/<int:pk>/', AddToCartView.as_view(), name='add-to-cart'),
+    path('cart/', CartPageView.as_view(), name='cart_page'),
 
 ]

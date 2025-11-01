@@ -9,8 +9,10 @@ from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from .forms import ForgotPasswordForm, ResetPasswordForm,ProfileUpdateForm
 from django.contrib.auth.models import User
-from dashboard.models import Product,Wishlist
+from dashboard.models import Product,Wishlist,cart
 from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 
 
 class GetWishlistView(LoginRequiredMixin, View):
@@ -25,6 +27,12 @@ class GetWishlistView(LoginRequiredMixin, View):
             for item in wishlist_items
         ]
         return JsonResponse({'wishlist': data})
+class GetCartCountView(LoginRequiredMixin, View):
+    def get(self, request):
+        cart_count = cart.objects.filter(user=request.user).count()
+        return JsonResponse({'cart_count': cart_count})
+
+
 
 class ToggleWishlistView(LoginRequiredMixin, View):
     login_url = 'index_login'
@@ -32,6 +40,7 @@ class ToggleWishlistView(LoginRequiredMixin, View):
     def post(self, request, product_id, *args, **kwargs):
         product = get_object_or_404(Product, id=product_id)
         wishlist_item, created = Wishlist.objects.get_or_create(user=request.user, product=product)
+        # cart_item, created = cart.objects.get_or_create(user=request.user, Product=product)
 
         if not created:
             wishlist_item.delete()
@@ -41,11 +50,14 @@ class ToggleWishlistView(LoginRequiredMixin, View):
 
         # ✅ Get updated wishlist count for the logged-in user
         wishlist_count = Wishlist.objects.filter(user=request.user).count()
+        # cart_count = cart.objects.filter(user=request.user).count()
+
 
         return JsonResponse({
             'status': status,
             'product_id': product.id,
-            'wishlist_count': wishlist_count
+            'wishlist_count': wishlist_count,
+            # 'cart_count': cart_count
         })
         
 class IndexLoginview(FormView):
@@ -373,14 +385,35 @@ class ProductDeleteView(DeleteView):
     success_url = reverse_lazy('product_list')
 
 
+@method_decorator(login_required, name='dispatch')
 class AddToCartView(View):
     def post(self, request, pk):
         product = get_object_or_404(Product, pk=pk)
-        
-        # Example simple session cart
-        cart = request.session.get('cart', {})
-        cart[str(product.id)] = cart.get(str(product.id), 0) + 1
-        request.session['cart'] = cart
+        user = request.user  # logged-in user
+        product_qty = int(request.POST.get('product_qty', 1))
 
-        messages.success(request, f"{product.name} added to your cart!")
-        return redirect('user_product_detail', slug=product.slug)
+        # ✅ Correct field names (lowercase)
+        cart_item, created = cart.objects.get_or_create(
+            user=user,
+            product=product,
+            defaults={'product_qty': product_qty}
+        )
+
+        if not created:
+            # If it already exists, just update quantity
+            cart_item.product_qty += product_qty
+            cart_item.save()
+
+        return JsonResponse({
+            'message': f'{product.name} added to your cart!',
+            'cart_count': cart.objects.filter(user=user).count()
+        })
+class CartPageView(LoginRequiredMixin, View):
+    def get(self, request):
+        user_cart = cart.objects.filter(user=request.user)
+        total_price = sum(item.product.price * item.product_qty for item in user_cart)
+        
+        return render(request, 'cart_page.html', {
+            'cart_items': user_cart,
+            'total_price': total_price
+        })
