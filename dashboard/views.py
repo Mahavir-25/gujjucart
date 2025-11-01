@@ -220,10 +220,15 @@ class IndexView(TemplateView):
             context['wishlist_product_ids'] = []
 
         return context
+class headerView(TemplateView):
+    template_name = "dashboard/index_header.html"
+    
+
     
 class UserProfileView(LoginRequiredMixin,TemplateView):
     template_name = "dashboard/user_profile.html"
     login_url = reverse_lazy('login')
+    
 
 class UserProductDetailView(DetailView):
     model = Product
