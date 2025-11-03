@@ -13,6 +13,7 @@ from dashboard.models import Product,Wishlist,cart
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+import json
 
 
 class GetWishlistView(LoginRequiredMixin, View):
@@ -27,6 +28,28 @@ class GetWishlistView(LoginRequiredMixin, View):
             for item in wishlist_items
         ]
         return JsonResponse({'wishlist': data})
+    
+class DeleteCartItemView(LoginRequiredMixin, View):
+    def post(self, request):
+        import json
+        data = json.loads(request.body)
+        cart_id = data.get('cart_id')
+
+        try:
+            cart_item = cart.objects.get(id=cart_id, user=request.user)
+            cart_item.delete()
+
+            total_price = sum(
+                item.product.price * item.product_qty 
+                for item in cart.objects.filter(user=request.user)
+            )
+
+            return JsonResponse({
+                'success': True,
+                'total_price': total_price
+            })
+        except cart.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Item not found'}, status=404)  
 class GetCartCountView(LoginRequiredMixin, View):
     def get(self, request):
         cart_count = cart.objects.filter(user=request.user).count()
@@ -416,9 +439,38 @@ class AddToCartView(View):
 class CartPageView(LoginRequiredMixin, View):
     def get(self, request):
         user_cart = cart.objects.filter(user=request.user)
-        total_price = sum(item.product.price * item.product_qty for item in user_cart)
-        
-        return render(request, 'cart_page.html', {
+
+        # Add subtotal for each item
+        for item in user_cart:
+            item.subtotal = item.product.price * item.product_qty
+
+        total_price = sum(item.subtotal for item in user_cart)
+
+        return render(request, 'dashboard/cart_page.html', {
             'cart_items': user_cart,
             'total_price': total_price
         })
+
+
+class UpdateCartQuantityView(LoginRequiredMixin, View):
+    def post(self, request):
+        data = json.loads(request.body)
+        cart_id = data.get('cart_id')
+        new_qty = int(data.get('quantity'))
+
+        try:
+            cart_item = cart.objects.get(id=cart_id, user=request.user)
+            cart_item.product_qty = new_qty
+            cart_item.save()
+
+            # recalc subtotal and total
+            subtotal = cart_item.product.price * cart_item.product_qty
+            total_price = sum(item.product.price * item.product_qty for item in cart.objects.filter(user=request.user))
+
+            return JsonResponse({
+                'success': True,
+                'subtotal': subtotal,
+                'total_price': total_price
+            })
+        except cart.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Item not found'}, status=404)

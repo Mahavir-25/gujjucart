@@ -1,0 +1,224 @@
+{% extends 'dashboard/index_base.html' %}
+{% load static %}
+
+{% block container %}
+
+<div class="container py-3">
+<div class="container mx-auto py-10 px-4">
+
+  <!-- Page Title -->
+  <h2 class="text-3xl font-semibold text-gray-800 mb-6 flex items-center">
+    <i class="fas fa-shopping-cart mr-2 text-blue-600"></i> My Cart
+  </h2>
+
+  {% if cart_items %}
+  <div class="bg-white shadow-md rounded-2xl overflow-hidden">
+    <table class="w-full text-left border-collapse">
+      <thead class="bg-blue-600 text-white">
+        <tr>
+          <th class="py-3 px-4">Product</th>
+          <th class="py-3 px-4 text-center">Price</th>
+          <th class="py-3 px-4 text-center">Quantity</th>
+          <th class="py-3 px-4 text-center">Subtotal</th>
+          <th class="py-3 px-4 text-center">Action</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y">
+        {% for item in cart_items %}
+        <tr class="hover:bg-gray-50 transition">
+          <!-- Product Image & Name -->
+          <td class="py-4 px-4 flex items-center space-x-4">
+            <img src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}" class="w-16 h-16 object-cover rounded-lg border">
+            <div>
+              <p class="font-semibold text-gray-800">{{ item.product.name }}</p>
+              <p class="text-sm text-gray-500">{{ item.product.category }}</p>
+            </div>
+          </td>
+
+          <!-- Price -->
+          <td class="text-center text-gray-700 font-medium">
+            ₹{{ item.product.price }}
+          </td>
+          
+      <!-- Quantity -->
+          <td class="text-center">
+            <div class="inline-flex items-center border rounded-md overflow-hidden">
+              <button class="qty-btn decrease px-3 py-1 bg-gray-100 hover:bg-gray-200" data-id="{{ item.id }}">−</button>
+
+              <input type="number"
+                    class="w-12 text-center border-x qty-input"
+                    value="{{ item.product_qty }}"
+                    data-id="{{ item.id }}"
+                    min="1">
+
+              <button class="qty-btn increase px-3 py-1 bg-gray-100 hover:bg-gray-200" data-id="{{ item.id }}">+</button>
+            </div>
+          </td>
+
+        <!-- Subtotal -->
+          <td class="text-center font-semibold text-gray-800 subtotal" data-id="{{ item.id }}">
+               ₹{{ item.subtotal }}
+            </td>
+
+          <!-- Remove -->
+          <td class="text-center">
+            <button class="text-red-500 hover:text-red-700 delete-item"
+                    data-id="{{ item.id }}">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Total Section -->
+  <div class="flex flex-col md:flex-row justify-between items-center mt-8 bg-gray-50 p-5 rounded-xl shadow-inner">
+    <div class="text-lg text-gray-700 font-medium mb-3 md:mb-0">
+      Total Items: <span id="total-items">{{ total_items }}</span>
+    </div>
+    <div class="text-xl font-semibold text-gray-900 mt-4 text-right">
+  Total Amount: ₹<span id="total-price">{{ total_price }}</span>
+</div>
+    {% comment %} <a href="{% url 'checkout' %}" 
+       class="bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700 transition">
+      Proceed to Checkout
+    </a> {% endcomment %}
+  </div>
+
+  {% else %}
+  <!-- Empty Cart -->
+  <div class="text-center py-20">
+    <img src="{% static 'images/empty_cart.svg' %}" alt="Empty Cart" class="mx-auto mb-6 w-40 h-40">
+    <h3 class="text-2xl font-semibold text-gray-700 mb-2">Your Cart is Empty</h3>
+    <p class="text-gray-500 mb-6">Looks like you haven’t added anything yet.</p>
+    <a href="{% url 'shop' %}" 
+       class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+      Continue Shopping
+    </a>
+  </div>
+  {% endif %}
+</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const csrfToken = '{{ csrf_token }}';
+
+ 
+  
+  // --- Handle manual typing ---
+  document.querySelectorAll('.qty-input').forEach(input => {
+    input.addEventListener('change', function () {
+      const cartId = this.dataset.id;
+      const newQty = this.value;
+      updateCartQuantity(cartId, newQty);
+    });
+  });
+
+  // --- Handle + / − buttons ---
+  document.querySelectorAll('.qty-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const input = this.parentElement.querySelector('.qty-input');
+      let newQty = parseInt(input.value);
+      if (this.classList.contains('increase')) newQty++;
+      if (this.classList.contains('decrease') && newQty > 1) newQty--;
+      input.value = newQty;
+      updateCartQuantity(this.dataset.id, newQty);
+    });
+  });
+
+  // --- AJAX function ---
+  function updateCartQuantity(cartId, newQty) {
+    fetch("{% url 'update_cart_quantity' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({ cart_id: cartId, quantity: newQty })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        console.log("✅ Quantity updated:", data);
+        // Optional: live update subtotal and total
+        document.querySelector(`[data-id='${cartId}'].subtotal`).textContent = `₹${data.subtotal}`;
+         // ✅ Update total
+    document.querySelector("#total-price").textContent = data.total_price;
+      } else {
+        alert("Error updating quantity");
+      }
+    });
+  }
+
+
+  // Delete item
+  document.querySelectorAll('.delete-item').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const id = this.getAttribute('data-id');
+      fetch(`/cart/remove/${id}/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': csrfToken}
+      }).then(res => location.reload());
+    });
+  });
+
+  // AJAX update quantity
+  function updateQuantity(id, qty) {
+    fetch(`/cart/update/${id}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrfToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({quantity: qty})
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('total-price').innerText = data.total_price;
+      document.querySelector(`.subtotal[data-id="${id}"]`).innerText = '₹' + data.subtotal;
+      document.getElementById('total-items').innerText = data.total_items;
+    });
+  }
+    // 🔹 Attach listener to delete buttons
+  document.querySelectorAll('.delete-item').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const cartId = this.dataset.id;
+      if (!confirm("Remove this item from cart?")) return;
+
+      fetch("{% url 'delete_cart_item' %}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({ cart_id: cartId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          console.log("🗑️ Item removed:", data);
+
+          // ✅ Remove row from table
+          const row = btn.closest('tr');
+          if (row) row.remove();
+
+          // ✅ Update total price
+          document.querySelector("#total-price").textContent = data.total_price;
+
+          // ✅ Optional: show toast or small fadeout effect
+          // Example (simple fade)
+          // row.style.transition = 'opacity 0.3s'; row.style.opacity = 0; setTimeout(() => row.remove(), 300);
+
+        } else {
+          alert("Error removing item: " + (data.error || 'Unknown error'));
+        }
+      })
+      .catch(err => console.error("Fetch error:", err));
+    });
+  }); 
+});
+</script>
+{% endblock container %}

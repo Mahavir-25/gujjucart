@@ -1,6 +1,6 @@
 
 from django.urls import path
-from dashboard.views import IndexView,CartPageView,GetCartCountView,AddToCartView,UserProductDetailView,GetWishlistView,UserProfileView,ToggleWishlistView,IndexLoginview,IndexSignupView,DashboardIndexView,SignupView,ProfileView ,ProductUpdateView,ProductDeleteView,ProductDetailView, ProductListView,AddProductView,LoginView,LogoutView,ForgotPasswordView,ResetPasswordView,ProfileUpdateView
+from dashboard.views import IndexView,DeleteCartItemView,CartPageView,UpdateCartQuantityView,GetCartCountView,AddToCartView,UserProductDetailView,GetWishlistView,UserProfileView,ToggleWishlistView,IndexLoginview,IndexSignupView,DashboardIndexView,SignupView,ProfileView ,ProductUpdateView,ProductDeleteView,ProductDetailView, ProductListView,AddProductView,LoginView,LogoutView,ForgotPasswordView,ResetPasswordView,ProfileUpdateView
 
 urlpatterns = [
    
@@ -26,5 +26,7 @@ urlpatterns = [
     path('get-cart-count/', GetCartCountView.as_view(), name='get_cart_count'),    path('product/<slug:slug>/', UserProductDetailView.as_view(), name='user_product_detail'),
     path('add-to-cart/<int:pk>/', AddToCartView.as_view(), name='add-to-cart'),
     path('cart/', CartPageView.as_view(), name='cart_page'),
+    path('update-cart-quantity/', UpdateCartQuantityView.as_view(), name='update_cart_quantity'),
+    path('delete-cart-item/', DeleteCartItemView.as_view(), name='delete_cart_item'),
 
 ]
