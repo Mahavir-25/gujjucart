@@ -10,68 +10,12 @@
     const prevBtn = document.getElementById('prevSlide');
     const nextBtn = document.getElementById('nextSlide');
     const dots = document.querySelectorAll('[data-slide]');
-      const toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    const toastElList = [].slice.call(document.querySelectorAll('.toast'));
     toastElList.forEach(toastEl => {
       const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
       toast.show();
     });
-  
- 
-        let currentIndex = 0;
-        const totalSlides = slides.length;
-        let autoSlideInterval;
 
-        // Show slide by index
-        function showSlide(index) {
-            currentIndex = (index + totalSlides) % totalSlides;
-            slider.style.transform = `translateX(-${currentIndex * 100}%)`;
-
-            // Update dots
-            dots.forEach((dot, i) => {
-            if (i === currentIndex) {
-                dot.classList.add('bg-white');
-                dot.classList.remove('bg-white/50');
-            } else {
-                dot.classList.remove('bg-white');
-                dot.classList.add('bg-white/50');
-            }
-            });
-        }
-
-        // Next and previous buttons
-        nextBtn.addEventListener('click', () => {
-            showSlide(currentIndex + 1);
-            resetAutoSlide();
-        });
-
-        prevBtn.addEventListener('click', () => {
-            showSlide(currentIndex - 1);
-            resetAutoSlide();
-        });
-
-        // Dot click navigation
-        dots.forEach((dot, i) => {
-            dot.addEventListener('click', () => {
-            showSlide(i);
-            resetAutoSlide();
-            });
-        });
-
-        // Auto slide function
-        function startAutoSlide() {
-            autoSlideInterval = setInterval(() => {
-            showSlide(currentIndex + 1);
-            }, 5000); // change slide every 5 seconds
-        }
-
-        function resetAutoSlide() {
-            clearInterval(autoSlideInterval);
-            startAutoSlide();
-        }
-
-        // Initialize slider
-        showSlide(0);
-        startAutoSlide();
 
     /* ✅ 1. Helper Function: Get CSRF Token */
     function getCookie(name) {
@@ -117,6 +61,7 @@
 
     /* ✅ 3. Fetch Latest Wishlist from Server */
     function fetchUpdatedWishlist() {
+    
         fetch(`/get-wishlist/`)
             .then(res => res.json())
             .then(data => {
@@ -145,6 +90,64 @@
             });
         }
     }
+      
+ if (slider && slides.length > 0 && prevBtn && nextBtn && dots.length > 0) {
+    let currentIndex = 0;
+    const totalSlides = slides.length;
+    let autoSlideInterval;
+
+    // Show slide by index
+    function showSlide(index) {
+        currentIndex = (index + totalSlides) % totalSlides;
+        slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+        // Update dots
+        dots.forEach((dot, i) => {
+            if (i === currentIndex) {
+                dot.classList.add('bg-white');
+                dot.classList.remove('bg-white/50');
+            } else {
+                dot.classList.remove('bg-white');
+                dot.classList.add('bg-white/50');
+            }
+        });
+    }
+
+    // Next and previous buttons
+    nextBtn.addEventListener('click', () => {
+        showSlide(currentIndex + 1);
+        resetAutoSlide();
+    });
+
+    prevBtn.addEventListener('click', () => {
+        showSlide(currentIndex - 1);
+        resetAutoSlide();
+    });
+
+    // Dot click navigation
+    dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => {
+            showSlide(i);
+            resetAutoSlide();
+        });
+    });
+
+    // Auto slide function
+    function startAutoSlide() {
+        autoSlideInterval = setInterval(() => {
+            showSlide(currentIndex + 1);
+        }, 5000); // every 5 seconds
+    }
+
+    function resetAutoSlide() {
+        clearInterval(autoSlideInterval);
+        startAutoSlide();
+    }
+
+    // Initialize slider
+    showSlide(0);
+    startAutoSlide();
+}
  
 
 

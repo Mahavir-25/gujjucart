@@ -1,6 +1,7 @@
 {% extends "dashboard/index_base.html"%}
-{% block container %}
 {% load static%}
+
+{% block container %}
     <!-- Hero Section -->
     <section class="relative h-screen overflow-hidden">
         <!-- Slider Container -->
@@ -130,7 +131,6 @@
                   <div class="p-4">
                       <h3 class="font-semibold text-gray-800 mb-2 truncate">{{ product.name }}</h3>
                       <p class="text-gray-800 font-bold text-lg mb-2">${{ product.price }}</p>
-                      <button class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-md transition">Add to Cart</button>
                   </div>
               </div>
               {% endfor %}
